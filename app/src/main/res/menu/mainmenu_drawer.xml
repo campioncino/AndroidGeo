@@ -1,0 +1,55 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <!--<group android:checkableBehavior="single">-->
+    <item
+        android:id="@+id/section1"
+        android:title="Ricette">
+        <menu>
+            <item
+                android:id="@+id/menuitem_registro"
+
+                android:title="Registro Ricette" />
+        </menu>
+    </item>
+
+    <!--</group>-->
+
+    <!--<group android:checkableBehavior="single">-->
+
+    <item
+        android:id="@+id/section2"
+        android:title="Nuova Ricetta">
+        <menu>
+            <item
+                android:id="@+id/menuitem_veterinaria"
+
+                android:title="Prescrizione Veterinaria" />
+
+            <item
+                android:id="@+id/menuitem_scortaimpianto"
+
+                android:title="Scorta Impianto" />
+
+            <item
+                android:id="@+id/menuitem_scortapropria"
+
+                android:title="Scorta Propria" />
+        </menu>
+    </item>
+    <!--</group>-->
+
+    <!--<group android:checkableBehavior="single">-->
+    <item
+        android:id="@+id/section3"
+        android:title="Dati">
+        <menu>
+            <item
+                android:id="@+id/menuitem_download"
+
+                android:title="Aggiornamento Dati Utente" />
+        </menu>
+    </item>
+
+    <!--</group>-->
+</menu>
