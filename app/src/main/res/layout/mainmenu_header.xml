@@ -17,7 +17,7 @@
         android:layout_margin="@dimen/spacing_large"
         android:src="@drawable/background" />
 
-    <it.izs.android.roboto.view.RobotoTextView
+    <TextView
         android:id="@+id/menu_username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
