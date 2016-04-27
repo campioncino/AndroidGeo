@@ -255,6 +255,10 @@ public class MainMenuActivity extends AppCompatActivity {
     }
 
     private void openDue() {
+        currentFragment = new MapFragment();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction().replace(R.id.content_frame,currentFragment);
+        fragmentTransaction.commit();
 //        Intent i = new Intent(this, PrescrizioneVeterinariaWrapperActivity.class);
 //        startActivityForResult(i, Code.REQUEST_WIZARD);
     }
