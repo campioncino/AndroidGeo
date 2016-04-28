@@ -4,8 +4,13 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -18,6 +23,10 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.example.androidgeotest.R;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.materialdrawer.AccountHeader;
@@ -36,13 +45,15 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import fr.quentinklein.slt.LocationTracker;
 
 
-public class MainMenuActivity extends AppCompatActivity {
+public class MainMenuActivity extends AppCompatActivity implements
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private NavigationView navigationView;
     private TextView headerUsername;
 
     public Drawer drawer = null;
 
+    private CoordinatorLayout coordinatorLayout;
     public PrimaryDrawerItem itemUno = null;
     public PrimaryDrawerItem itemDue = null;
     public PrimaryDrawerItem itemTre = null;
@@ -51,11 +62,25 @@ public class MainMenuActivity extends AppCompatActivity {
     private Fragment currentFragment;
 
     private LocationTracker locationTracker;
+    private GoogleApiClient mGoogleApiClient;
+
+    private Location mStartLocation;
+    private Location mLastLocation;
+    private LocationRequest mLocationRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.content);
+        // Create an instance of GoogleAPIClient.
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+        }
 
         setContentView(R.layout.mainmenu);
         initToolbar();
@@ -163,6 +188,7 @@ public class MainMenuActivity extends AppCompatActivity {
 //        openRegistroRicette();
         drawer.openDrawer();
 //        refreshRicetteCounter();
+
 
     }
 
@@ -285,6 +311,51 @@ public class MainMenuActivity extends AppCompatActivity {
 //                }
 //                break;
 //        }
+    }
+
+    @Override
+    public void onConnected(Bundle connectionHint) {
+        System.out.println("on connected");
+        mLocationRequest = LocationRequest.create();
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+//        mLocationRequest.setInterval(1000); // Update location every second
+
+
+
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+        if (mLastLocation != null) {
+            System.out.println("lat="+(String.valueOf(mLastLocation.getLatitude())));
+            System.out.println("\nlon="+(String.valueOf(mLastLocation.getLongitude())));
+        }
+        else {
+            System.out.println("e ma allora...");
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Snackbar snackbar = Snackbar
+                .make(coordinatorLayout, "Connection Failed", Snackbar.LENGTH_LONG);
+
+        snackbar.show();
+    }
+
+    protected void onStart() {
+        System.out.println("on start");
+        mGoogleApiClient.connect();
+        super.onStart();
+    }
+
+    protected void onStop() {
+        System.out.println("on stop");
+        mGoogleApiClient.disconnect();
+        super.onStop();
     }
 
 }
