@@ -1,16 +1,19 @@
 package com.example.androidgeotest.activities;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -18,75 +21,65 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.androidgeotest.R;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
-import com.mikepenz.materialdrawer.AccountHeader;
-import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.holder.BadgeStyle;
-import com.mikepenz.materialdrawer.holder.StringHolder;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
-import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
-import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
 import fr.quentinklein.slt.LocationTracker;
+import fr.quentinklein.slt.TrackerSettings;
 
 
-public class MainMenuActivity extends AppCompatActivity implements
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class MainMenuActivity extends AppCompatActivity{
 
     private NavigationView navigationView;
     private TextView headerUsername;
 
     public Drawer drawer = null;
 
-    private CoordinatorLayout coordinatorLayout;
     public PrimaryDrawerItem itemUno = null;
     public PrimaryDrawerItem itemDue = null;
     public PrimaryDrawerItem itemTre = null;
 
-
     private Fragment currentFragment;
 
-    private LocationTracker locationTracker;
-    private GoogleApiClient mGoogleApiClient;
+    private LocationManager locationManager;
+    private String provider;
 
-    private Location mStartLocation;
-    private Location mLastLocation;
-    private LocationRequest mLocationRequest;
+    private Location defaultLocation;
+    private CoordinatorLayout coordinatorLayout;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.content);
-        // Create an instance of GoogleAPIClient.
-        if (mGoogleApiClient == null) {
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .build();
-        }
-
         setContentView(R.layout.mainmenu);
         initToolbar();
 
+        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.content);
+        currentFragment = new DummyFragment();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction().replace(R.id.content_frame, currentFragment);
+        fragmentTransaction.commit();
+
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
-          View headerView = navigationView.getHeaderView(0);
+        View headerView = navigationView.getHeaderView(0);
 //        headerUsername = (TextView) headerView.findViewById(R.id.menu_username);
 //        headerUsername.setText(MyApplication.account.getAccCodice());
 
@@ -108,7 +101,7 @@ public class MainMenuActivity extends AppCompatActivity implements
 
         itemUno = new PrimaryDrawerItem()
                 .withIdentifier(1)
-                .withName("UNO")
+                .withName("GpsActivity")
                 .withIcon(GoogleMaterial.Icon.gmd_favorite)
                 .withIconTintingEnabled(true)
                 .withBadgeStyle(new BadgeStyle()
@@ -157,7 +150,7 @@ public class MainMenuActivity extends AppCompatActivity implements
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
                         if (drawerItem != null) {
                             if (drawerItem.getIdentifier() == 1) {
-                                openUno();
+                                openMyGpsActivity();
                             } else if (drawerItem.getIdentifier() == 2) {
                                 openDue();
                             } else if (drawerItem.getIdentifier() == 3) {
@@ -187,8 +180,6 @@ public class MainMenuActivity extends AppCompatActivity implements
                 .build();
 //        openRegistroRicette();
         drawer.openDrawer();
-//        refreshRicetteCounter();
-
 
     }
 
@@ -212,7 +203,6 @@ public class MainMenuActivity extends AppCompatActivity implements
 //        }
 //
 //    }
-
 
 
     private void initToolbar() {
@@ -272,26 +262,26 @@ public class MainMenuActivity extends AppCompatActivity implements
 //        itemAggiornDati.withDescription("del DATA ULTIMO AGGIORNAMENTO!");
     }
 
-    private void openUno() {
-        currentFragment = new UnoFragment();
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager
-                .beginTransaction().replace(R.id.content_frame, currentFragment);
-        fragmentTransaction.commit();
+    private void openMyGpsActivity() {
+        Intent i = new Intent(this, MyGpsActivity.class);
+
+        i.putExtra("defaultLocation", defaultLocation);
+        startActivity(i);
     }
 
     private void openDue() {
-        currentFragment = new MapFragment();
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction().replace(R.id.content_frame,currentFragment);
-        fragmentTransaction.commit();
+        Intent i = new Intent(this, ShowLocationActivity.class);
+        startActivity(i);
+//        currentFragment = new MyMapFragment();
+//        FragmentManager fragmentManager = getSupportFragmentManager();
+//        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction().replace(R.id.content_frame,currentFragment);
+//        fragmentTransaction.commit();
 //        Intent i = new Intent(this, PrescrizioneVeterinariaWrapperActivity.class);
 //        startActivityForResult(i, Code.REQUEST_WIZARD);
     }
 
     private void openTre() {
-//        Intent i = new Intent(this, PrescrizioneScortaimpiantoWrapperActivity.class);
-//        startActivityForResult(i, Code.REQUEST_WIZARD);
+
     }
 
     private Fragment getCurrentFragment() {
@@ -311,51 +301,6 @@ public class MainMenuActivity extends AppCompatActivity implements
 //                }
 //                break;
 //        }
-    }
-
-    @Override
-    public void onConnected(Bundle connectionHint) {
-        System.out.println("on connected");
-        mLocationRequest = LocationRequest.create();
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-//        mLocationRequest.setInterval(1000); // Update location every second
-
-
-
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                mGoogleApiClient);
-        if (mLastLocation != null) {
-            System.out.println("lat="+(String.valueOf(mLastLocation.getLatitude())));
-            System.out.println("\nlon="+(String.valueOf(mLastLocation.getLongitude())));
-        }
-        else {
-            System.out.println("e ma allora...");
-        }
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Snackbar snackbar = Snackbar
-                .make(coordinatorLayout, "Connection Failed", Snackbar.LENGTH_LONG);
-
-        snackbar.show();
-    }
-
-    protected void onStart() {
-        System.out.println("on start");
-        mGoogleApiClient.connect();
-        super.onStart();
-    }
-
-    protected void onStop() {
-        System.out.println("on stop");
-        mGoogleApiClient.disconnect();
-        super.onStop();
     }
 
 }

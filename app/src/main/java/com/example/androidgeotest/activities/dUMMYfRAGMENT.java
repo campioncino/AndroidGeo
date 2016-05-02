@@ -20,7 +20,7 @@ import com.example.androidgeotest.R;
 /**
  * Created by izs on 05/04/16.
  */
-public class UnoFragment extends Fragment {
+public class DummyFragment extends Fragment {
 
     private CoordinatorLayout coordinatorLayout;
     private Button downloadButton;
@@ -34,7 +34,7 @@ public class UnoFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.uno, container, false);
+        View v = inflater.inflate(R.layout.dummy_page, container, false);
 
         //chiudo la tastiera
         InputMethodManager inputManager = (InputMethodManager)
@@ -45,7 +45,7 @@ public class UnoFragment extends Fragment {
         downloadButton = (Button) v.findViewById(R.id.download_button);
         downloadButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Log.d("UnoFragment","SCHIACCIATO");
+                Log.d("DummyFragment","SCHIACCIATO");
             }
         });
         return v;

@@ -30,7 +30,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="15dp"
-                android:text="Ricetta Elettronica"
+                android:text="Welcome Page"
                 android:textSize="25sp"
                 android:textStyle="bold" />
 
@@ -39,7 +39,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
-                android:text="Download Dati Utente"
+                android:text="Paragraph subtitle"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
@@ -47,7 +47,7 @@
                 android:id="@+id/message1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Da questa sezione è possibile scaricare i dati aggiornati necessari all'utilizzo dell'applicazione in modalità offline."
+                android:text="Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. "
                 />
 
 
@@ -63,7 +63,7 @@
                 android:id="@+id/message3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Ad ogni download i dati precedentemente memorizzati verranno sovrascritti ed eventuali ricette non inviate andranno perse."
+                android:text="Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo"
                 />
 
             <Button
@@ -72,7 +72,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="30dp"
                 android:background="@color/md_blue_400"
-                android:text="PULSANDO"
+                android:text="ACHTUNG!!"
                 android:textColor="@android:color/white" />
 
         </LinearLayout>
