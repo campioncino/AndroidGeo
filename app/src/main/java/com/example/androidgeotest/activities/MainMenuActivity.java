@@ -263,9 +263,7 @@ public class MainMenuActivity extends AppCompatActivity{
     }
 
     private void openMyGpsActivity() {
-        Intent i = new Intent(this, MyGpsActivity.class);
-
-        i.putExtra("defaultLocation", defaultLocation);
+        Intent i = new Intent(this, RunActivity.class);
         startActivity(i);
     }
 
@@ -282,6 +280,11 @@ public class MainMenuActivity extends AppCompatActivity{
 
     private void openTre() {
 
+
+        Intent i = new Intent(this, MyGpsActivity.class);
+
+        i.putExtra("defaultLocation", defaultLocation);
+        startActivity(i);
     }
 
     private Fragment getCurrentFragment() {

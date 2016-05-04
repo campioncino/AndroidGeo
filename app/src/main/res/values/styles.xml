@@ -8,4 +8,14 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="MyAppTheme" parent="AppTheme">
+        <item name="colorPrimary">@color/myPrimary</item>
+        <item name="colorPrimaryDark">@color/myPrimary_dark</item>
+        <item name="colorAccent">@color/myAccent</item>
+        <item name="android:divider">@color/myDivider</item>
+        <item name="android:textColorSecondary">@color/mySecondary_text</item>
+    </style>
+
+
+
 </resources>

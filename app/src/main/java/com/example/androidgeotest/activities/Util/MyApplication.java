@@ -1,4 +1,4 @@
-package com.example.androidgeotest.activities;
+package com.example.androidgeotest.activities.Util;
 
 /**
  * Created by r.sciamanna on 29/04/2016.
