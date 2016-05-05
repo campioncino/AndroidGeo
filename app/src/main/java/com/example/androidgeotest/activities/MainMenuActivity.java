@@ -10,6 +10,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
@@ -28,6 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.androidgeotest.R;
+import com.example.androidgeotest.activities.Util.MyApplication;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -45,12 +47,14 @@ import fr.quentinklein.slt.LocationTracker;
 import fr.quentinklein.slt.TrackerSettings;
 
 
-public class MainMenuActivity extends AppCompatActivity{
+public class MainMenuActivity extends AppCompatActivity {
 
     private NavigationView navigationView;
     private TextView headerUsername;
 
     public Drawer drawer = null;
+
+    public final int GPS_REQUEST_CODE = 123;
 
     public PrimaryDrawerItem itemUno = null;
     public PrimaryDrawerItem itemDue = null;
@@ -64,13 +68,16 @@ public class MainMenuActivity extends AppCompatActivity{
     private Location defaultLocation;
     private CoordinatorLayout coordinatorLayout;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.mainmenu);
         initToolbar();
+
+       checkGpsEnabled();
+
+
 
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.content);
         currentFragment = new DummyFragment();
@@ -80,8 +87,6 @@ public class MainMenuActivity extends AppCompatActivity{
 
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
         View headerView = navigationView.getHeaderView(0);
-//        headerUsername = (TextView) headerView.findViewById(R.id.menu_username);
-//        headerUsername.setText(MyApplication.account.getAccCodice());
 
 
         // Create the AccountHeader
@@ -165,8 +170,6 @@ public class MainMenuActivity extends AppCompatActivity{
                 .withSelectedItem(1)
                 .withOnDrawerListener(new Drawer.OnDrawerListener() {
                     public void onDrawerOpened(View drawerView) {
-                        //avviene solo dopo che è stato aperto ~ effetto fadeout
-//                        refreshRicetteCounter();
                     }
 
                     public void onDrawerClosed(View drawerView) {
@@ -174,35 +177,36 @@ public class MainMenuActivity extends AppCompatActivity{
                     }
 
                     public void onDrawerSlide(View drawerView, float slideOffset) {
-//                        refreshRicetteCounter();
                     }
                 })
                 .build();
-//        openRegistroRicette();
-        drawer.openDrawer();
+//        drawer.openDrawer();
 
     }
 
 
-
-//    public void refreshRicetteCounter() {
-//        RicettaExt ricetta = new RicettaExt();
-//        ricetta.setCodiceLingua("it");
-//        ricetta.setStatoricettaDescrizione(PageCostantiTO.STATORICETTA_INIZIALE);
-//        String ricetteCounter = null;
-//        try {
-//            ricetteCounter = String.valueOf(ricettaService.search(ricetta).size());
-//        } catch (CrudException e) {
-//            e.printStackTrace();
-//        }
-//        if (ricetteCounter != null && Integer.valueOf(ricetteCounter) >= 0) {
-//            drawer.updateBadge(1, new StringHolder(ricetteCounter));
-//            if (Integer.valueOf(ricetteCounter) == 0) {
-//                drawer.updateBadge(1, null);
-//            }
-//        }
-//
-//    }
+    //GPS ALERT DIALOG
+    private void showGPSDisabledAlertToUser() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setMessage("GPS is disabled in your device. Would you like to enable it?")
+                .setCancelable(false)
+                .setPositiveButton("Enable GPS",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                Intent callGPSSettingIntent = new Intent(
+                                        android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                                startActivityForResult(callGPSSettingIntent,GPS_REQUEST_CODE);
+                            }
+                        });
+        alertDialogBuilder.setNegativeButton("Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+        AlertDialog alert = alertDialogBuilder.create();
+        alert.show();
+    }
 
 
     private void initToolbar() {
@@ -254,17 +258,16 @@ public class MainMenuActivity extends AppCompatActivity{
 
 
     @Override
-    protected void onResumeFragments() {
-        super.onResumeFragments();
-//        refreshRicetteCounter();
-//        TODO decommentare per attivare la data dell'ultimo aggiornamento
-//        itemAggiornDati = (PrimaryDrawerItem) drawer.getDrawerItem(5);
-//        itemAggiornDati.withDescription("del DATA ULTIMO AGGIORNAMENTO!");
+    protected void onResume() {
+        super.onResume();
+//        checkGpsEnabled();
     }
 
     private void openMyGpsActivity() {
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
         Intent i = new Intent(this, RunActivity.class);
-        startActivity(i);
+        startActivity(i);}
+        else{checkGpsEnabled();}
     }
 
     private void openDue() {
@@ -293,17 +296,26 @@ public class MainMenuActivity extends AppCompatActivity{
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        switch (requestCode) {
-//            case Code.REQUEST_WIZARD:
-//                // VADO AL REGISTRO
-//                toRegistro = true;
-//                break;
-//            default:
-//                if (getCurrentFragment() != null) {
-//                    getCurrentFragment().onActivityResult(requestCode, resultCode, data);
-//                }
-//                break;
-//        }
+        if(requestCode == GPS_REQUEST_CODE && resultCode == 0){
+            locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                Toast.makeText(this, "GPS is Enabled in your devide", Toast.LENGTH_SHORT).show();
+            } else {
+               Toast.makeText(this,"GPS is MANDATORY",Toast.LENGTH_SHORT).show();
+                showGPSDisabledAlertToUser();
+            }
+        }
+        System.out.println("on activity result:\nresultCode:"+resultCode+"\nrequestCode:"+requestCode);
+    }
+
+    private void checkGpsEnabled(){
+        //check if gps is enabled or not
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            Toast.makeText(this, "GPS is Enabled in your devide", Toast.LENGTH_SHORT).show();
+        } else {
+            showGPSDisabledAlertToUser();
+        }
     }
 
 }

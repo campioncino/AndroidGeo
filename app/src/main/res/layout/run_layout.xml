@@ -121,7 +121,6 @@
 
 
             </android.support.v7.widget.CardView>
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -129,6 +128,7 @@
                 android:orientation="horizontal"
                 android:paddingBottom="10dp"
                 android:paddingTop="10dp">
+
 
                 <Button
                     android:id="@+id/big_start_button"
@@ -140,30 +140,44 @@
 
                 <Button
                     android:id="@+id/restart_button"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="2"
                     android:layout_height="wrap_content"
                     android:text="RIPRENDI"
                     android:visibility="gone"
-                    android:background="@color/deepOrangeA200"
+                    android:background="@color/greenA700"
                     android:textColor="@color/White"/>
                 <Button
                     android:id="@+id/pause_button"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="2"
                     android:layout_height="wrap_content"
                     android:text="PAUSA"
                     android:visibility="gone"
-                    android:background="@color/deepOrangeA200"
+                    android:background="@color/blueGray400"
                     android:textColor="@color/White"/>
-
+                <com.mikepenz.iconics.view.IconicsButton
+                    android:id="@+id/lock_button"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/circle"
+                    android:textColor="@color/accent"
+                    android:text="{gmd-lock}"
+                    android:textSize="80dp"
+                    android:visibility="gone"/>
                 <Button
                     android:id="@+id/stop_button"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="2"
                     android:layout_height="wrap_content"
                     android:text="STOP"
                     android:visibility="gone"
-                    android:background="@color/red700"
+                    android:background="@color/blueGray400"
                     android:textColor="@color/White"/>
+
             </LinearLayout>
+
         </LinearLayout>
 
 </android.support.v4.widget.DrawerLayout>

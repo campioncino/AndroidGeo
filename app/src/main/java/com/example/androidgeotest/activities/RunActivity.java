@@ -2,7 +2,9 @@ package com.example.androidgeotest.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.location.Location;
+import android.opengl.Visibility;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -16,12 +18,18 @@ import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.TextView;
 
+import com.dd.morphingbutton.MorphingButton;
 import com.example.androidgeotest.R;
 import com.example.androidgeotest.activities.Util.MyApplication;
 import com.example.androidgeotest.activities.Util.MyChronometer;
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.iconics.Iconics;
+import com.mikepenz.iconics.IconicsDrawable;
+import com.mikepenz.iconics.view.IconicsButton;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimerTask;
 
 import fr.quentinklein.slt.LocationTracker;
 import fr.quentinklein.slt.TrackerSettings;
@@ -37,6 +45,7 @@ public class RunActivity extends AppCompatActivity implements View.OnClickListen
     private Button btnPause;
     private Button btnReStart;
 
+    private IconicsButton btnLock;
     private Chronometer chronometer;
 
     long timeWhenStopped = 0;
@@ -55,10 +64,10 @@ public class RunActivity extends AppCompatActivity implements View.OnClickListen
 
     private static List<Location> locationList = new ArrayList<Location>();
 
-    private MyApplication myApplication;
 
     private static final int MENU_FILTER = 123;
     private static final int MENU_FILTER_CLEAR = 666;
+
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -101,14 +110,19 @@ public class RunActivity extends AppCompatActivity implements View.OnClickListen
 
         btnStop = (Button) findViewById(R.id.stop_button);
         btnStop.setOnClickListener(this);
+        btnStop.setEnabled(false);
 
         btnPause = (Button) findViewById(R.id.pause_button);
         btnPause.setOnClickListener(this);
+        btnPause.setEnabled(false);
 
         btnReStart = (Button) findViewById(R.id.restart_button);
         btnReStart.setOnClickListener(this);
+        btnReStart.setEnabled(false);
 
-        myApplication = new MyApplication();
+        btnLock = (IconicsButton) findViewById(R.id.lock_button);
+        btnLock.setOnClickListener(this);
+
     }
 
     @Override
@@ -134,30 +148,74 @@ public class RunActivity extends AppCompatActivity implements View.OnClickListen
                 doStop();
                 break;
             case R.id.big_start_button:
-               doFirstStart();
+                doFirstStart();
 
             case R.id.restart_button:
                 doReStart();
                 break;
+            case R.id.lock_button:
+                doLock();
+        }
+    }
+
+    private void doLock() {
+        if (btnLock.isEnabled()) {
+
+            btnPause.setEnabled(true);
+            btnPause.setBackgroundColor(getResources().getColor(R.color.orange700));
+            btnStop.setEnabled(true);
+            btnStop.setBackgroundColor(getResources().getColor(R.color.red700));
+            btnLock.setEnabled(false);
+            btnLock.setTextColor(getResources().getColor(R.color.blueGray400));
+            btnLock.setText("{gmd-lock-open}");
+            /*************************************************/
+
+            final Runnable r = new Runnable()
+            {
+                public void run()
+                {
+                    btnLock.setText("{gmd-lock}");
+                    btnLock.setEnabled(false);
+                    btnLock.setTextColor(getResources().getColor(R.color.accent));
+                    btnStop.setEnabled(false);
+                    btnStop.setBackgroundColor(getResources().getColor(R.color.blueGray400));
+                    btnPause.setEnabled(false);
+                    btnPause.setBackgroundColor(getResources().getColor(R.color.blueGray400));
+                }
+            };
+            mHandler.postDelayed(r, 5000);
+
+            /****************************************************/
+
+
+
+        } else {
+            System.out.println("entro qui");
+            btnLock.setText("{gmd-lock}");
+            btnLock.setEnabled(false);
+            btnLock.setTextColor(getResources().getColor(R.color.accent));
+            btnStop.setEnabled(false);
+            btnStop.setBackgroundColor(getResources().getColor(R.color.blueGray400));
+            btnPause.setEnabled(false);
+            btnPause.setBackgroundColor(getResources().getColor(R.color.blueGray400));
         }
     }
 
 
-
-    private Runnable updateTask = new Runnable () {
+    private Runnable updateTask = new Runnable() {
         public void run() {
             Log.wtf(getString(R.string.app_name) + " ChatList.updateTask()",
                     "updateTask run!");
 
-            kmText.setText(""+kmValueWhenStopped);
-            kmValueWhenStopped = kmValueWhenStopped+5;
+            kmText.setText("" + kmValueWhenStopped);
+            kmValueWhenStopped = kmValueWhenStopped + 5;
 
             // queue the task to run again in 5 seconds...
             mHandler.postDelayed(updateTask, 5000);
         }
     };
 
-    public void doPause(){
+    public void doPause() {
         timeWhenStopped = chronometer.getBase() - SystemClock.elapsedRealtime();
         chronometer.stop();
         mHandler.removeCallbacks(updateTask);
@@ -168,9 +226,9 @@ public class RunActivity extends AppCompatActivity implements View.OnClickListen
         btnStart.setVisibility(View.GONE);
     }
 
-    public void doReStart(){
+    public void doReStart() {
         chronometer.setBase(SystemClock.elapsedRealtime()
-                +timeWhenStopped);
+                + timeWhenStopped);
         chronometer.start();
         mHandler.postDelayed(updateTask, 5000);
         btnPause.setVisibility(View.VISIBLE);
@@ -183,29 +241,32 @@ public class RunActivity extends AppCompatActivity implements View.OnClickListen
         chronometer.setBase(SystemClock.elapsedRealtime());
         chronometer.stop();
         timeWhenStopped = 0;
-        kmValueWhenStopped=0;
+        kmValueWhenStopped = 0;
         chronometer.setText("00:00:00");
-        kmText.setText(""+0);
+        kmText.setText("" + 0);
         mHandler.removeCallbacks(updateTask);
         stopListeningLocation();
         btnPause.setVisibility(View.GONE);
         btnStop.setVisibility(View.GONE);
         btnStart.setVisibility(View.VISIBLE);
         btnReStart.setVisibility(View.GONE);
-        if(!locationList.isEmpty()){
-            Log.wtf("locationList","elementi "+locationList.size());
+        if (!locationList.isEmpty()) {
+            Log.wtf("locationList", "elementi " + locationList.size());
         }
     }
 
     private void doFirstStart() {
         chronometer.setBase(SystemClock.elapsedRealtime()
-                +timeWhenStopped);
+                + timeWhenStopped);
         chronometer.start();
         startLocationTracker(this);
         mHandler.postDelayed(updateTask, 5000);
 
+        btnLock.setVisibility(View.VISIBLE);
         btnPause.setVisibility(View.VISIBLE);
+        btnPause.setEnabled(false);
         btnStop.setVisibility(View.VISIBLE);
+        btnStop.setEnabled(false);
         btnStart.setVisibility(View.GONE);
         btnReStart.setVisibility(View.GONE);
     }
@@ -216,9 +277,9 @@ public class RunActivity extends AppCompatActivity implements View.OnClickListen
                         .setUseGPS(true)
                         .setUseNetwork(true)
                         .setUsePassive(true);
-                        //update every 30 mins
+        //update every 30 mins
 //                        .setTimeBetweenUpdates(30 * 60 * 1000)
-                        //update every 100 mt
+        //update every 100 mt
 //                        .setMetersBetweenUpdates(100);
 
         LocationTracker tracker = new LocationTracker(context, settings) {
@@ -226,14 +287,14 @@ public class RunActivity extends AppCompatActivity implements View.OnClickListen
             @Override
             public void onLocationFound(Location location) {
                 locationList.add(location);
-                if(!locationList.isEmpty()){
-                    Log.wtf("locationList","elementi "+locationList.size());
+                if (!locationList.isEmpty()) {
+                    Log.wtf("locationList", "elementi " + locationList.size());
                 }
             }
 
             @Override
             public void onTimeout() {
-                Log.wtf("timeout","orcodio");
+                Log.wtf("timeout", "orcodio");
             }
         };
         tracker.startListening();

@@ -53,4 +53,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-maps:8.4.0'
     compile 'com.google.android.gms:play-services-location:8.4.0'
     compile 'com.google.android.gms:play-services-appindexing:8.4.0'
+
+    /* morphing buttons */
+    compile 'com.github.dmytrodanylyk:android-morphing-button:98a4986e56' // commit hash
 }
