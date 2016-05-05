@@ -175,7 +175,7 @@ public class RunActivity extends AppCompatActivity implements View.OnClickListen
                 public void run()
                 {
                     btnLock.setText("{gmd-lock}");
-                    btnLock.setEnabled(false);
+                    btnLock.setEnabled(true);
                     btnLock.setTextColor(getResources().getColor(R.color.accent));
                     btnStop.setEnabled(false);
                     btnStop.setBackgroundColor(getResources().getColor(R.color.blueGray400));
@@ -192,7 +192,7 @@ public class RunActivity extends AppCompatActivity implements View.OnClickListen
         } else {
             System.out.println("entro qui");
             btnLock.setText("{gmd-lock}");
-            btnLock.setEnabled(false);
+            btnLock.setEnabled(true);
             btnLock.setTextColor(getResources().getColor(R.color.accent));
             btnStop.setEnabled(false);
             btnStop.setBackgroundColor(getResources().getColor(R.color.blueGray400));
