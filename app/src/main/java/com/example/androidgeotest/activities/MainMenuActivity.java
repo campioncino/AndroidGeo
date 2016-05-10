@@ -264,10 +264,15 @@ public class MainMenuActivity extends AppCompatActivity {
     }
 
     private void openMyGpsActivity() {
-        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-        Intent i = new Intent(this, RunActivity.class);
-        startActivity(i);}
-        else{checkGpsEnabled();}
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            Log.wtf("MainActivity", "Location is Enabled");
+            Intent i = new Intent(this, RunActivity.class);
+            startActivity(i);
+        }
+        else{
+//            Log.wtf("MainActivity","Location is NOT Enabled");
+            checkGpsEnabled();
+        }
     }
 
     private void openDue() {
