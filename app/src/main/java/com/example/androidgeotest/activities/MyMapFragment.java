@@ -72,7 +72,7 @@ public class MyMapFragment extends SupportMapFragment implements GoogleApiClient
                 .addApi( LocationServices.API )
                 .build();
 
-        defaultLocation = (Location) getActivity().getIntent().getExtras().get("defaultLocation");
+//        defaultLocation = (Location) getActivity().getIntent().getExtras().get("defaultLocation");
         initListeners();
 
         coordinatorLayout = (CoordinatorLayout) getActivity().findViewById(R.id.content);

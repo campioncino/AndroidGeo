@@ -180,7 +180,7 @@ public class MainMenuActivity extends AppCompatActivity {
                     }
                 })
                 .build();
-//        drawer.openDrawer();
+        drawer.openDrawer();
 
     }
 
@@ -266,7 +266,9 @@ public class MainMenuActivity extends AppCompatActivity {
     private void openMyGpsActivity() {
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             Log.wtf("MainActivity", "Location is Enabled");
-            Intent i = new Intent(this, RunActivity.class);
+//            Intent i = new Intent(this, RunActivity.class);
+            Intent i = new Intent(this, RunningActivity.class);
+
             startActivity(i);
         }
         else{
