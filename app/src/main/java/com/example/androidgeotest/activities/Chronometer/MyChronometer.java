@@ -34,7 +34,7 @@ import fr.quentinklein.slt.TrackerSettings;
  * Created by r.sciamanna on 03/05/2016.
  */
 public class MyChronometer extends Fragment implements View.OnClickListener{
-    private final String TAG = "MyChronometer";
+    final static String TAG = MyChronometer.class.getSimpleName();
     private Handler mHandler = new Handler();
     private Button btnStart;
     private Button btnStop;
