@@ -278,7 +278,7 @@ public class MainMenuActivity extends AppCompatActivity {
     }
 
     private void openDue() {
-        Intent i = new Intent(this, ShowLocationActivity.class);
+        Intent i = new Intent(this, TestMapActivity.class);
         startActivity(i);
 //        currentFragment = new MyMapFragment();
 //        FragmentManager fragmentManager = getSupportFragmentManager();
@@ -291,7 +291,7 @@ public class MainMenuActivity extends AppCompatActivity {
     private void openTre() {
 
 
-        Intent i = new Intent(this, MyGpsActivity.class);
+        Intent i = new Intent(this, FusedLocationActivity.class);
 
         i.putExtra("defaultLocation", defaultLocation);
         startActivity(i);

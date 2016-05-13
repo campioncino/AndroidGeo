@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import com.example.androidgeotest.R;
 import com.example.androidgeotest.activities.Chronometer.MyChronometer;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.mikepenz.iconics.view.IconicsButton;
 
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ import fr.quentinklein.slt.TrackerSettings;
  */
 
 
-public class RunningActivity extends AppCompatActivity implements View.OnClickListener {
+public class RunningActivity extends AppCompatActivity implements View.OnClickListener{
 
 
     private Fragment mapFragment;
