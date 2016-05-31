@@ -27,9 +27,9 @@ public class TestMapActivity extends AppCompatActivity implements OnMapReadyCall
 
     public static final CameraPosition TERAMO =
             new CameraPosition.Builder().target(TERAMOLATLNG)
-                    .zoom(15.5f)
+                    .zoom(11.0f)
                     .bearing(0)
-                    .tilt(25)
+                    .tilt(30)
                     .build();
 
     private GoogleMap mMap;

@@ -278,7 +278,9 @@ public class MainMenuActivity extends AppCompatActivity {
     }
 
     private void openDue() {
-        Intent i = new Intent(this, TestMapActivity.class);
+//        Intent i = new Intent(this, TestMapActivity.class);
+        Intent i = new Intent(this, MapLocationActivity.class);
+
         startActivity(i);
 //        currentFragment = new MyMapFragment();
 //        FragmentManager fragmentManager = getSupportFragmentManager();
