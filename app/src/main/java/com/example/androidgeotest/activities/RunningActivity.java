@@ -1,14 +1,19 @@
 package com.example.androidgeotest.activities;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PersistableBundle;
 import android.os.SystemClock;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -18,10 +23,24 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.androidgeotest.R;
 import com.example.androidgeotest.activities.Chronometer.MyChronometer;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.mikepenz.iconics.view.IconicsButton;
 
 import java.util.ArrayList;
@@ -35,7 +54,7 @@ import fr.quentinklein.slt.TrackerSettings;
  */
 
 
-public class RunningActivity extends AppCompatActivity implements View.OnClickListener{
+public class RunningActivity extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
 
     private Fragment mapFragment;
@@ -45,7 +64,7 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
     private Button btnStop;
     private Button btnPause;
     private Button btnReStart;
-
+    private boolean amIrunning = false;
     private IconicsButton btnLock;
     private Chronometer chronometer;
 
@@ -60,6 +79,13 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
     private TextView kmText;
     private long timeWhenStopped = 0;
     private String text;
+    LocationRequest mLocationRequest;
+    GoogleApiClient mGoogleApiClient;
+
+    LatLng latLng;
+    GoogleMap mGoogleMap;
+    SupportMapFragment mFragment;
+    Marker currLocationMarker;
 
     private Bundle mbundle;
     private int viewId;
@@ -79,9 +105,9 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
 
         myChronometerLayout = findViewById(R.id.mychronometerLayout);
 
-        mapFragment = new MapFragment();
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.map_fragment, mapFragment).commit();
+//        mapFragment = new MapFragment();
+//        getSupportFragmentManager().beginTransaction()
+//                .replace(R.id.map_fragment, mapFragment).commit();
 
 
         CollapsingToolbarLayout collapsingToolbar =
@@ -119,9 +145,12 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
         btnLock.setOnClickListener(this);
         initChrono();
 
+        mFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_fragment);
+        mFragment.getMapAsync(this);
 
     }
 
+    /************  CHRONO ****************/
 
     private void initChrono() {
         chronometer.setText("00:00:00");
@@ -169,10 +198,7 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
         chronometer.setBase(SystemClock.elapsedRealtime()
                 + timeWhenStopped);
         chronometer.start();
-        startLocationTracker(this);
-
-
-
+        amIrunning=true;
         mHandler.postDelayed(updateTask, 2000);
 
         btnLock.setVisibility(View.VISIBLE);
@@ -182,30 +208,6 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
         btnStop.setEnabled(false);
         btnStart.setVisibility(View.GONE);
         btnReStart.setVisibility(View.GONE);
-    }
-
-    public Location getLastBestLocation() {
-        LocationManager mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        Location locationGPS = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        Location locationNet = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-
-        long GPSLocationTime = 0;
-        if (null != locationGPS) { GPSLocationTime = locationGPS.getTime(); }
-
-        long NetLocationTime = 0;
-
-        if (null != locationNet) {
-            NetLocationTime = locationNet.getTime();
-        }
-
-        if ( 0 < GPSLocationTime - NetLocationTime ) {
-
-            return locationGPS;
-        }
-        else {
-
-            return locationNet;
-        }
     }
 
 
@@ -270,6 +272,7 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
     public void doPause() {
         timeWhenStopped = chronometer.getBase() - SystemClock.elapsedRealtime();
         chronometer.stop();
+        amIrunning=false;
         mHandler.removeCallbacks(updateTask);
 
         btnReStart.setVisibility(View.VISIBLE);
@@ -284,6 +287,7 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
         chronometer.setBase(SystemClock.elapsedRealtime()
                 + timeWhenStopped);
         chronometer.start();
+        amIrunning=true;
         mHandler.postDelayed(updateTask, 5000);
         btnPause.setVisibility(View.VISIBLE);
         btnStop.setVisibility(View.VISIBLE);
@@ -294,12 +298,12 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
     private void doStop() {
         chronometer.setBase(SystemClock.elapsedRealtime());
         chronometer.stop();
+        amIrunning=false;
         timeWhenStopped = 0;
         kmValueWhenStopped = 0;
         chronometer.setText("00:00:00");
         kmText.setText("" + 0.0);
         mHandler.removeCallbacks(updateTask);
-        stopListeningLocation();
         btnPause.setVisibility(View.GONE);
         btnStop.setVisibility(View.GONE);
         btnStart.setVisibility(View.VISIBLE);
@@ -309,65 +313,17 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
-    private void startLocationTracker(Context context) {
-        TrackerSettings settings =
-                new TrackerSettings()
-                        .setUseGPS(true)
-                        .setUseNetwork(true)
-                        .setUsePassive(true)
-                        //update every 30 mins
-//                        .setTimeBetweenUpdates(30 * 60 * 1000)
-                        //update every 3 seconds
-                        .setTimeBetweenUpdates(3 * 1000);
-//        update every 100 mt
-//                        .setMetersBetweenUpdates(100);
+    /************  END CHRONO *************/
 
-        locationTracker = new LocationTracker(context, settings) {
-
-            @Override
-            public void onLocationFound(Location location) {
-                locationList.add(location);
-                if (!locationList.isEmpty()) {
-                    Log.wtf("locationList", "elementi " + locationList.size());
-                }
-            }
-
-            @Override
-            public void onTimeout() {
-                Log.wtf(TAG, "Timeout");
-            }
-        };
-        locationTracker.startListening();
+    protected synchronized void buildGoogleApiClient() {
+        Toast.makeText(this, "buildGoogleApiClient", Toast.LENGTH_SHORT).show();
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
     }
 
-    private void stopListeningLocation() {
-        if (locationTracker != null && locationTracker.isListening()) {
-            locationTracker.stopListening();
-        }
-    }
-
-
-    public static List<Location> getLocations() {
-        return locationList;
-    }
-
-    public static void clearLocations() {
-        locationList.clear();
-    }
-
-    public static Location getLastLocation() {
-        if (!locationList.isEmpty()) {
-            return locationList.get(locationList.size() - 1);
-        }
-        return null;
-    }
-
-    public static Location getFirstLocation() {
-        if (!locationList.isEmpty()) {
-            return locationList.get(0);
-        }
-        return null;
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -382,4 +338,118 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
         return true;
     }
 
+
+    /************  MAPS ****************/
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mGoogleMap = googleMap;
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        mGoogleMap.setMyLocationEnabled(true);
+
+        buildGoogleApiClient();
+
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        Toast.makeText(this, "onConnected", Toast.LENGTH_SHORT).show();
+        Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+        if (mLastLocation != null) {
+            //place marker at current position
+            //mGoogleMap.clear();
+            latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(latLng);
+            markerOptions.title("Current Position");
+            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
+            currLocationMarker = mGoogleMap.addMarker(markerOptions);
+        }
+
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(5000); //5 seconds
+        mLocationRequest.setFastestInterval(3000); //3 seconds
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        //mLocationRequest.setSmallestDisplacement(0.1F); //1/10 meter
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Toast.makeText(this, "onConnectionSuspended", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Toast.makeText(this, "onConnectionFailed", Toast.LENGTH_SHORT).show();
+    }
+
+
+    public void onLocationChanged(Location location) {
+
+        //place marker at current position
+        //mGoogleMap.clear();
+        if (currLocationMarker != null) {
+            currLocationMarker.remove();
+        }
+        latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(latLng);
+        markerOptions.title("Current Position");
+        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
+        currLocationMarker = mGoogleMap.addMarker(markerOptions);
+
+        Toast.makeText(this, "Location Changed", Toast.LENGTH_SHORT).show();
+
+        //zoom to current position:
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(latLng).zoom(16).build();
+
+        mGoogleMap.animateCamera(CameraUpdateFactory
+                .newCameraPosition(cameraPosition));
+
+        Log.wtf("latLng", latLng.toString());
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        location = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+        if(amIrunning) {
+            locationList.add(location);
+            Log.wtf("lastLocation", location.toString());
+        }
+        //If you only need one location, unregister the listener
+        //LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+
+    }
+
+    /************ END MAPS *************/
 }

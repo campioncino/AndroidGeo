@@ -145,7 +145,7 @@ public class MapLocationActivity extends AppCompatActivity implements
 
         //zoom to current position:
         CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(latLng).zoom(14).build();
+                .target(latLng).zoom(16).build();
 
         mGoogleMap.animateCamera(CameraUpdateFactory
                 .newCameraPosition(cameraPosition));
