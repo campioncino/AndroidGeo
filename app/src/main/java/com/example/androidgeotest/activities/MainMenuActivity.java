@@ -33,6 +33,7 @@ import com.example.androidgeotest.activities.Util.MyApplication;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.mikepenz.community_material_typeface_library.CommunityMaterial;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.materialdrawer.Drawer;
@@ -107,7 +108,7 @@ public class MainMenuActivity extends AppCompatActivity {
         itemUno = new PrimaryDrawerItem()
                 .withIdentifier(1)
                 .withName("GpsActivity")
-                .withIcon(GoogleMaterial.Icon.gmd_favorite)
+                .withIcon(GoogleMaterial.Icon.gmd_directions_run)
                 .withIconTintingEnabled(true)
                 .withBadgeStyle(new BadgeStyle()
                         .withColorRes(R.color.md_red_700)
@@ -116,8 +117,8 @@ public class MainMenuActivity extends AppCompatActivity {
         itemDue = new PrimaryDrawerItem()
                 .withIdentifier(2)
                 .withName("DUE")
-                .withIcon(GoogleMaterial.Icon.gmd_view_week)
-                .withIconColorRes(R.color.md_white_1000)
+                .withIcon(CommunityMaterial.Icon.cmd_run)
+                .withIconColorRes(R.color.orange800)
                 .withSelectedIconColor(ContextCompat.getColor(this, R.color.md_amber_300))
                 .withIconTintingEnabled(true)
                 .withBadgeStyle(new BadgeStyle()
@@ -307,6 +308,7 @@ public class MainMenuActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == GPS_REQUEST_CODE && resultCode == 0){
             locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+            Log.wtf("MainMenu","activity result code ="+resultCode);
             if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                 Toast.makeText(this, "GPS is Enabled in your devide", Toast.LENGTH_SHORT).show();
             } else {

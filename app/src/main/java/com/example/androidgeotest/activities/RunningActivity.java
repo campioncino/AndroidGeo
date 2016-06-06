@@ -150,7 +150,9 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
 
     }
 
-    /************  CHRONO ****************/
+    /************
+     * CHRONO
+     ****************/
 
     private void initChrono() {
         chronometer.setText("00:00:00");
@@ -198,7 +200,8 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
         chronometer.setBase(SystemClock.elapsedRealtime()
                 + timeWhenStopped);
         chronometer.start();
-        amIrunning=true;
+        locationList.clear();
+        amIrunning = true;
         mHandler.postDelayed(updateTask, 2000);
 
         btnLock.setVisibility(View.VISIBLE);
@@ -272,7 +275,7 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
     public void doPause() {
         timeWhenStopped = chronometer.getBase() - SystemClock.elapsedRealtime();
         chronometer.stop();
-        amIrunning=false;
+        amIrunning = false;
         mHandler.removeCallbacks(updateTask);
 
         btnReStart.setVisibility(View.VISIBLE);
@@ -287,7 +290,7 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
         chronometer.setBase(SystemClock.elapsedRealtime()
                 + timeWhenStopped);
         chronometer.start();
-        amIrunning=true;
+        amIrunning = true;
         mHandler.postDelayed(updateTask, 5000);
         btnPause.setVisibility(View.VISIBLE);
         btnStop.setVisibility(View.VISIBLE);
@@ -298,7 +301,7 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
     private void doStop() {
         chronometer.setBase(SystemClock.elapsedRealtime());
         chronometer.stop();
-        amIrunning=false;
+        amIrunning = false;
         timeWhenStopped = 0;
         kmValueWhenStopped = 0;
         chronometer.setText("00:00:00");
@@ -313,7 +316,9 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
-    /************  END CHRONO *************/
+    /************
+     * END CHRONO
+     *************/
 
     protected synchronized void buildGoogleApiClient() {
         Toast.makeText(this, "buildGoogleApiClient", Toast.LENGTH_SHORT).show();
@@ -339,7 +344,9 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
     }
 
 
-    /************  MAPS ****************/
+    /************
+     * MAPS
+     ****************/
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mGoogleMap = googleMap;
@@ -428,8 +435,10 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
 
         mGoogleMap.animateCamera(CameraUpdateFactory
                 .newCameraPosition(cameraPosition));
-
-        Log.wtf("latLng", latLng.toString());
+        if(amIrunning) {
+            Log.wtf("On locationChanged latLng", latLng.toString());
+            locationList.add(location);
+        }
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -442,7 +451,7 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
         }
         location = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
-        if(amIrunning) {
+        if (amIrunning) {
             locationList.add(location);
             Log.wtf("lastLocation", location.toString());
         }
