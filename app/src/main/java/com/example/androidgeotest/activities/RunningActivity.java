@@ -99,7 +99,7 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
     SupportMapFragment mFragment;
     Marker currLocationMarker;
 
-    private Polyline polyline;
+    private PolylineOptions polylineOptions;
 
     private Bundle mbundle;
     private int viewId;
@@ -214,6 +214,8 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
     private void doFirstStart() {
         initChrono();
         myRace = new Race();
+        polylineOptions = new PolylineOptions();
+        mGoogleMap.clear();
         Calendar c = Calendar.getInstance();
         SimpleDateFormat dateformat = new SimpleDateFormat("dd-MMM-yyyy hh:mm:ss");
         try {
@@ -517,7 +519,7 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
 
     public void draw(List<Location> locationList){
 
-        PolylineOptions polylineOptions = new PolylineOptions();
+        polylineOptions = new PolylineOptions();
         for(Location loc : locationList){
             polylineOptions.add(new LatLng(loc.getLatitude(),loc.getLongitude()));
             Log.wtf("polyline", loc.toString());
