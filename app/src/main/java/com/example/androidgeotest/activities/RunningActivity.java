@@ -3,6 +3,7 @@ package com.example.androidgeotest.activities;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -27,6 +28,9 @@ import android.widget.Toast;
 
 import com.example.androidgeotest.R;
 import com.example.androidgeotest.activities.Chronometer.MyChronometer;
+import com.example.androidgeotest.activities.business.CrudException;
+import com.example.androidgeotest.activities.business.RaceService;
+import com.example.androidgeotest.activities.business.model.Race;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -41,9 +45,15 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.gson.Gson;
 import com.mikepenz.iconics.view.IconicsButton;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import fr.quentinklein.slt.LocationTracker;
@@ -68,6 +78,8 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
     private IconicsButton btnLock;
     private Chronometer chronometer;
 
+    private Race myRace;
+
     double kmValueWhenStopped = 0.000;
     double kcalValueWhenStopped = 0.000;
     private LocationTracker locationTracker;
@@ -87,10 +99,16 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
     SupportMapFragment mFragment;
     Marker currLocationMarker;
 
+    private Polyline polyline;
+
     private Bundle mbundle;
     private int viewId;
 
     private View myChronometerLayout;
+
+    public RaceService raceService;
+
+
 
 
     @Override
@@ -108,8 +126,7 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
 //        mapFragment = new MapFragment();
 //        getSupportFragmentManager().beginTransaction()
 //                .replace(R.id.map_fragment, mapFragment).commit();
-
-
+        raceService = new RaceService(this);
         CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle("Attività");
@@ -196,6 +213,14 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
 
     private void doFirstStart() {
         initChrono();
+        myRace = new Race();
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat dateformat = new SimpleDateFormat("dd-MMM-yyyy hh:mm:ss");
+        try {
+            myRace.setStart(dateformat.parse(c.getTime().toString()));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         kmText.setText(String.valueOf(kmValueWhenStopped));
         chronometer.setBase(SystemClock.elapsedRealtime()
                 + timeWhenStopped);
@@ -311,9 +336,38 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
         btnStop.setVisibility(View.GONE);
         btnStart.setVisibility(View.VISIBLE);
         btnReStart.setVisibility(View.GONE);
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat dateformat = new SimpleDateFormat("dd-MMM-yyyy hh:mm:ss");
+        try {
+            myRace.setStop(dateformat.parse(c.getTime().toString()));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         if (!locationList.isEmpty()) {
             Log.wtf("locationList", "elementi " + locationList.size());
+            draw(locationList);
+            setFinish(locationList,myRace);
+            try {
+                raceService.insert(myRace);
+            } catch (CrudException e) {
+                e.printStackTrace();
+            }
         }
+    }
+
+
+    public void setFinish(List<Location> locations, Race race){
+        race.setTrip(new Gson().toJson(locations));
+        race.setTotalDuration(locations.get(locations.size()-1).getElapsedRealtimeNanos());
+        race.setTotalDistace(calculateDistance(locations));
+    }
+
+    public float calculateDistance(List<Location> locations){
+        float distance=0;
+        for(int i=0; i<locations.size()-1;i++){
+                distance = locations.get(i).distanceTo(locations.get(i + 1));
+        }
+        return distance;
     }
 
     /************
@@ -460,5 +514,17 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
 
     }
 
+
+    public void draw(List<Location> locationList){
+
+        PolylineOptions polylineOptions = new PolylineOptions();
+        for(Location loc : locationList){
+            polylineOptions.add(new LatLng(loc.getLatitude(),loc.getLongitude()));
+            Log.wtf("polyline", loc.toString());
+        }
+        polylineOptions.width(5).color(Color.BLUE);
+        mGoogleMap.addPolyline(polylineOptions);
+
+    }
     /************ END MAPS *************/
 }

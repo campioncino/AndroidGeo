@@ -28,13 +28,61 @@ public class Race extends Entity{
     public Date stop;
 
     @DatabaseField(columnName = "DISTANCE")
-    public double totalDistace;
+    public float totalDistace;
 
     @DatabaseField(columnName = "DURATION")
     public double totalDuration;
 
     @DatabaseField(columnName = "RACE_TRACK")
     public String trip;
+
+    public Integer getRaceId() {
+        return raceId;
+    }
+
+    public void setRaceId(Integer raceId) {
+        this.raceId = raceId;
+    }
+
+    public Date getStart() {
+        return start;
+    }
+
+    public void setStart(Date start) {
+        this.start = start;
+    }
+
+    public Date getStop() {
+        return stop;
+    }
+
+    public void setStop(Date stop) {
+        this.stop = stop;
+    }
+
+    public float getTotalDistace() {
+        return totalDistace;
+    }
+
+    public void setTotalDistace(float totalDistace) {
+        this.totalDistace = totalDistace;
+    }
+
+    public double getTotalDuration() {
+        return totalDuration;
+    }
+
+    public void setTotalDuration(double totalDuration) {
+        this.totalDuration = totalDuration;
+    }
+
+    public String getTrip() {
+        return trip;
+    }
+
+    public void setTrip(String trip) {
+        this.trip = trip;
+    }
 
     public Race() {
         super();
@@ -62,7 +110,7 @@ public class Race extends Entity{
         this.trip = (String) in.readValue(String.class.getClassLoader());
         this.start = (Date) in.readValue(Date.class.getClassLoader());
         this.stop = (Date) in.readValue(Date.class.getClassLoader());
-        this.totalDistace = (Double) in.readValue(Double.class.getClassLoader());
+        this.totalDistace = (float) in.readValue(Double.class.getClassLoader());
         this.totalDuration = (Double) in.readValue(Double.class.getClassLoader());
     }
 
