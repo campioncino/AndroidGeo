@@ -55,4 +55,8 @@ dependencies {
     /* ormlite */
     compile 'com.j256.ormlite:ormlite-core:4.48'
     compile 'com.j256.ormlite:ormlite-android:4.48'
+
+    /* firebase */
+    compile 'com.firebase:firebase-client-android:2.5.2+'
+
 }
