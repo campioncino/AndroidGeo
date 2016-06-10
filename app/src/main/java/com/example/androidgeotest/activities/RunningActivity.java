@@ -31,6 +31,7 @@ import com.example.androidgeotest.activities.Chronometer.MyChronometer;
 import com.example.androidgeotest.activities.business.CrudException;
 import com.example.androidgeotest.activities.business.RaceService;
 import com.example.androidgeotest.activities.business.model.Race;
+import com.firebase.client.Firebase;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -109,11 +110,17 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
     public RaceService raceService;
 
 
+    public Firebase myFirebaseRef;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Firebase.setAndroidContext(this);
+
+        /* mi setto sul mio firebase db */
+        myFirebaseRef = new Firebase("https://androidgeotest.firebaseio.com/RACE");
+
         setContentView(R.layout.running_activity_layout);
 //        AndroidBug5497Workaround.assistActivity(this);
 
@@ -359,9 +366,13 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
 
 
     public void setFinish(List<Location> locations, Race race){
-        race.setTrip(new Gson().toJson(locations));
+        //race.setTrip(new Gson().toJson(locations));
         race.setTotalDuration(locations.get(locations.size()-1).getElapsedRealtimeNanos());
         race.setTotalDistace(calculateDistance(locations));
+
+        Firebase raceRef = myFirebaseRef.child("androidgeotest").child("RACE");
+        raceRef.setValue(locations);
+        myFirebaseRef.setValue(race);
     }
 
     public float calculateDistance(List<Location> locations){
