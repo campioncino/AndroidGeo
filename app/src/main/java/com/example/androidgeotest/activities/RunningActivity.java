@@ -369,8 +369,8 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
 
     public void setFinish(List<Location> locations, Race race){
         //race.setTrip(new Gson().toJson(locations));
-        race.setTotalDuration(locations.get(0).getElapsedRealtimeNanos()-
-                locations.get(locations.size()-1).getElapsedRealtimeNanos());
+        race.setTotalDuration(
+                locations.get(locations.size()-1).getElapsedRealtimeNanos()-locations.get(0).getElapsedRealtimeNanos());
         race.setTotalDistace(calculateDistance(locations));
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("Race");
