@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">AndroidGeoTest</string>
-    <string name="google_api_key">AIzaSyD_aPVO1XeWZfrEZ-mVHboDUpW_MzRdJo4</string>
+    <!--<string name="google_api_key">AIzaSyD_aPVO1XeWZfrEZ-mVHboDUpW_MzRdJo4</string>-->
     <string name="title_activity_fused_location">FusedLocationActivity</string>
 </resources>

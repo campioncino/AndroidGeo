@@ -31,7 +31,7 @@ import com.example.androidgeotest.activities.Chronometer.MyChronometer;
 import com.example.androidgeotest.activities.business.CrudException;
 import com.example.androidgeotest.activities.business.RaceService;
 import com.example.androidgeotest.activities.business.model.Race;
-import com.firebase.client.Firebase;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -48,6 +48,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.Gson;
 import com.mikepenz.iconics.view.IconicsButton;
 
@@ -110,16 +112,16 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
     public RaceService raceService;
 
 
-    public Firebase myFirebaseRef;
+    public DatabaseReference rootRef;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Firebase.setAndroidContext(this);
 
         /* mi setto sul mio firebase db */
-        myFirebaseRef = new Firebase("https://androidgeotest.firebaseio.com/RACE");
+        rootRef = FirebaseDatabase.getInstance()
+                .getReferenceFromUrl("https://androidgeotest-6915a.firebaseio.com/");
 
         setContentView(R.layout.running_activity_layout);
 //        AndroidBug5497Workaround.assistActivity(this);
@@ -367,12 +369,14 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
 
     public void setFinish(List<Location> locations, Race race){
         //race.setTrip(new Gson().toJson(locations));
-        race.setTotalDuration(locations.get(locations.size()-1).getElapsedRealtimeNanos());
+        race.setTotalDuration(locations.get(0).getElapsedRealtimeNanos()-
+                locations.get(locations.size()-1).getElapsedRealtimeNanos());
         race.setTotalDistace(calculateDistance(locations));
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference("Race");
 
-        Firebase raceRef = myFirebaseRef.child("androidgeotest").child("RACE");
-        raceRef.setValue(locations);
-        myFirebaseRef.setValue(race);
+        myRef.setValue(race);
+        //rootRef.setValue(race);
     }
 
     public float calculateDistance(List<Location> locations){

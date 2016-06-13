@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "149854631625",
+    "firebase_url": "https://androidgeotest-6915a.firebaseio.com",
+    "project_id": "androidgeotest-6915a",
+    "storage_bucket": "androidgeotest-6915a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:149854631625:android:f579ffa45f6c10a1",
+        "android_client_info": {
+          "package_name": "com.example.androidgeotest"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "149854631625-59ee0jc7b3jqncnm23uen9ok0ct45jst.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.androidgeotest",
+            "certificate_hash": "C65EA16444468F1F94DF094F873A75FBCC2E9CBA"
+          }
+        },
+        {
+          "client_id": "149854631625-qioqq51tsn4661qd6a2lnmkqhp04jo4u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDD75SrZj7r3fCF0cS9rvYKNsMeioWXI14"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "149854631625-qioqq51tsn4661qd6a2lnmkqhp04jo4u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
