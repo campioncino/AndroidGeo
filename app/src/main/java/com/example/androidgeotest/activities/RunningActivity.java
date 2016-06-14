@@ -387,7 +387,7 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
         return distance;
     }
 
-    /************
+     /************
      * END CHRONO
      *************/
 

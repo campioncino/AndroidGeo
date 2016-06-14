@@ -16,6 +16,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
@@ -30,6 +31,10 @@ import android.widget.Toast;
 
 import com.example.androidgeotest.R;
 import com.example.androidgeotest.activities.Util.MyApplication;
+import com.example.androidgeotest.activities.auth.GoogleSignInActivity;
+import com.example.androidgeotest.activities.auth.GoogleSignInFragment;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -69,6 +74,8 @@ public class MainMenuActivity extends AppCompatActivity {
     private Location defaultLocation;
     private CoordinatorLayout coordinatorLayout;
 
+    private GoogleApiClient mGoogleApiClient;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,9 +83,7 @@ public class MainMenuActivity extends AppCompatActivity {
         setContentView(R.layout.mainmenu);
         initToolbar();
 
-       checkGpsEnabled();
-
-
+        checkGpsEnabled();
 
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.content);
         currentFragment = new DummyFragment();
@@ -293,19 +298,30 @@ public class MainMenuActivity extends AppCompatActivity {
 
     private void openTre() {
 
-
-        Intent i = new Intent(this, FusedLocationActivity.class);
-
-        i.putExtra("defaultLocation", defaultLocation);
-        startActivity(i);
+        openLogin();
+//         Intent i = new Intent(this, GoogleSignInActivity.class);
+//        startActivity(i);
+//        Intent i = new Intent(this, FusedLocationActivity.class);
+//
+//        i.putExtra("defaultLocation", defaultLocation);
+//        startActivity(i);
     }
 
-    private Fragment getCurrentFragment() {
-        return currentFragment;
+    public void openLogin() {
+        currentFragment = new GoogleSignInFragment();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager
+                .beginTransaction().replace(R.id.content_frame, currentFragment);
+        fragmentTransaction.commit();
     }
+
+//    private Fragment getCurrentFragment() {
+//        return currentFragment;
+//    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == GPS_REQUEST_CODE && resultCode == 0){
             locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
             Log.wtf("MainMenu","activity result code ="+resultCode);
@@ -315,6 +331,9 @@ public class MainMenuActivity extends AppCompatActivity {
                Toast.makeText(this,"GPS is MANDATORY",Toast.LENGTH_SHORT).show();
                 showGPSDisabledAlertToUser();
             }
+        }
+        if(requestCode == 205609){
+            Log.wtf("MainMenuActivity","requestCode ="+requestCode);
         }
         System.out.println("on activity result:\nresultCode:"+resultCode+"\nrequestCode:"+requestCode);
     }
