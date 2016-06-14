@@ -322,20 +322,37 @@ public class MainMenuActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == GPS_REQUEST_CODE && resultCode == 0){
-            locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-            Log.wtf("MainMenu","activity result code ="+resultCode);
-            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                Toast.makeText(this, "GPS is Enabled in your devide", Toast.LENGTH_SHORT).show();
-            } else {
-               Toast.makeText(this,"GPS is MANDATORY",Toast.LENGTH_SHORT).show();
-                showGPSDisabledAlertToUser();
-            }
+        switch(requestCode){
+            case GPS_REQUEST_CODE:
+                if(resultCode == 0){
+                    locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+                    Log.wtf("MainMenu","activity result code ="+resultCode);
+                    if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                        Toast.makeText(this, "GPS is Enabled in your devide", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(this,"GPS is MANDATORY",Toast.LENGTH_SHORT).show();
+                        showGPSDisabledAlertToUser();
+                    }
+                }
+                break;
+            default:
+                System.out.println("on activity result:\nresultCode:"+resultCode+"\nrequestCode:"+requestCode);
+                break;
         }
-        if(requestCode == 205609){
-            Log.wtf("MainMenuActivity","requestCode ="+requestCode);
-        }
-        System.out.println("on activity result:\nresultCode:"+resultCode+"\nrequestCode:"+requestCode);
+//        if(requestCode == GPS_REQUEST_CODE && resultCode == 0){
+//            locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+//            Log.wtf("MainMenu","activity result code ="+resultCode);
+//            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+//                Toast.makeText(this, "GPS is Enabled in your devide", Toast.LENGTH_SHORT).show();
+//            } else {
+//                Toast.makeText(this,"GPS is MANDATORY",Toast.LENGTH_SHORT).show();
+//                showGPSDisabledAlertToUser();
+//            }
+//        }
+//        if(requestCode == 205609){
+//            Log.wtf("MainMenuActivity","requestCode ="+requestCode);
+//        }
+
     }
 
     private void checkGpsEnabled(){

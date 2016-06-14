@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.androidgeotest.R;
+import com.example.androidgeotest.activities.MainMenuActivity;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -174,6 +175,8 @@ public class GoogleSignInFragment extends BaseFragment implements GoogleApiClien
                 // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = result.getSignInAccount();
                 firebaseAuthWithGoogle(account);
+                Intent i = new Intent(getActivity(),MainMenuActivity.class);
+                startActivity(i);
             } else {
                 Log.wtf("auth","login failed");
                 // Google Sign In failed, update UI appropriately
