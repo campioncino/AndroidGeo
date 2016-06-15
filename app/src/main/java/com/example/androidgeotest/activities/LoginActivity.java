@@ -18,6 +18,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 /**
  * Created by r.sciamanna on 14/06/2016.
@@ -27,7 +28,9 @@ public class LoginActivity extends AppCompatActivity {
 
     private final static int AUTH_REQ_CODE = 001;
     GoogleApiClient googleApiClient;
-    FirebaseAuth mAuth;
+
+
+    String mAuthUser;
 
     private Fragment currentFragment;
     private CoordinatorLayout coordinatorLayout;
@@ -36,11 +39,22 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_layout);
-        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.content);
-        currentFragment = new GoogleSignInFragment();
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction().replace(R.id.content_frame, currentFragment);
-        fragmentTransaction.commit();
+        mAuthUser = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+
+        if(mAuthUser!=null){
+            Intent i = new Intent(this,MainMenuActivity.class);
+            i.putExtra("user",mAuthUser);
+            startActivity(i);
+        }else{
+//            System.out.println("MAUTH = "+mAuth.getCurrentUser().toString());
+            System.out.println("firebase user assente");
+            coordinatorLayout = (CoordinatorLayout) findViewById(R.id.content);
+            currentFragment = new GoogleSignInFragment();
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction().replace(R.id.content_frame, currentFragment);
+            fragmentTransaction.commit();
+        }
+
     }
 
     @Override

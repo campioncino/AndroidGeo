@@ -22,7 +22,17 @@ public class CustomSQLiteOpenHelper extends OrmLiteSqliteOpenHelper {
 
     // name of the database file for your application -- change to something
     // appropriate for your app
-    private static String DATABASE_NAME = "database.db";
+    private static String DATABASE_NAME = "mydatabase.db";
+
+    //TABLE RACE DATA
+    private static final String RACE_TABLE_NAME = "RACE";
+    private static final String RACE_COL_ID = "RACE_ID";
+    private static final String RACE_COL_START = "START";
+    private static final String RACE_COL_STOP = "STOP";
+    private static final String RACE_COL_DURATION = "DURATION";
+    private static final String RACE_COL_DISTANCE = "DISTANCE";
+    private static final String RACE_COL_TRACK = "TRACK";
+
     // any time you make changes to your database, you may have to increase the
     // database version
     private static final int DATABASE_VERSION = 1;
@@ -30,7 +40,7 @@ public class CustomSQLiteOpenHelper extends OrmLiteSqliteOpenHelper {
     public CustomSQLiteOpenHelper(Context context) {
         super(context, whichDatabase(), null, DATABASE_VERSION);
 //        boolean dbexist = isDatabaseExistent(context);
-        Log.d("databaseHelper", "creazione");
+        Log.wtf("databaseHelper", "creazione");
 //        if (!dbexist) {
 //            Log.d("prova", "provo a copiare");
 //            copyFiles(context);
@@ -47,7 +57,7 @@ public class CustomSQLiteOpenHelper extends OrmLiteSqliteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase database,
                          ConnectionSource connectionSource) {
-
+        String CREATE_RACE_TABLE = "CREATE TABLE IF NOT EXISTS " + DATABASE_NAME + "( RACE_ID INTEGER PRIMARY KEY AUTOINCREMENT KEY_START DATE  KEY_STOP DATE KEY_DISTANCE  TEXT  KEY_DURATION TEXT KEY_RACE_TRACK TEXT )";
     }
 
     @Override
@@ -60,7 +70,7 @@ public class CustomSQLiteOpenHelper extends OrmLiteSqliteOpenHelper {
         String myPath = context.getDatabasePath(whichDatabase()).toString();
         File dbfile = new File(myPath);
         checkdb = dbfile.exists();
-        Log.i(CustomSQLiteOpenHelper.class.getName(), "DB Exist : " + checkdb);
+        Log.wtf(CustomSQLiteOpenHelper.class.getName(), "DB Exist : " + checkdb);
         return checkdb;
     }
 
@@ -86,8 +96,8 @@ public class CustomSQLiteOpenHelper extends OrmLiteSqliteOpenHelper {
                 dir.mkdirs();
             }
 //            System.out.println(context.getFilesDir().getAbsolutePath());
-            Log.d(this.getClass().getSimpleName(),context.getFilesDir().getAbsolutePath());
-            Log.d("openFileToCopy", outFileName);
+            Log.wtf(this.getClass().getSimpleName(),context.getFilesDir().getAbsolutePath());
+            Log.wtf("openFileToCopy", outFileName);
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             int size = 0;
             // Read the entire resource into a local byte buffer.

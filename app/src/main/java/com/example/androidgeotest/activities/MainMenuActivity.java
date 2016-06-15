@@ -1,22 +1,15 @@
 package com.example.androidgeotest.activities;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
@@ -30,27 +23,28 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.androidgeotest.R;
-import com.example.androidgeotest.activities.Util.MyApplication;
-import com.example.androidgeotest.activities.auth.GoogleSignInActivity;
 import com.example.androidgeotest.activities.auth.GoogleSignInFragment;
-import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.ConnectionResult;
+import com.example.androidgeotest.activities.business.dao.CustomSQLiteOpenHelper;
+import com.example.androidgeotest.activities.business.dao.DatabaseHelper;
+import com.example.androidgeotest.activities.running.RunningActivity;
+import com.facebook.stetho.Stetho;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.mikepenz.community_material_typeface_library.CommunityMaterial;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
+import com.mikepenz.materialdrawer.AccountHeader;
+import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.holder.BadgeStyle;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
-
-import fr.quentinklein.slt.LocationTracker;
-import fr.quentinklein.slt.TrackerSettings;
+import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
 
 public class MainMenuActivity extends AppCompatActivity {
@@ -79,7 +73,16 @@ public class MainMenuActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        //vediamo se funziona questo
+        Stetho.initializeWithDefaults(this);
+        if(DatabaseHelper.isDatabaseExistent(this)){
+            DatabaseHelper.clearDatabase(this);
+            Log.wtf("MainMenu","database esistente");
+        }
+        else{
+            Log.wtf("MainMenu","database NON esistente");
+            CustomSQLiteOpenHelper db = new CustomSQLiteOpenHelper(this);
+        }
         setContentView(R.layout.mainmenu);
         initToolbar();
 
@@ -91,24 +94,29 @@ public class MainMenuActivity extends AppCompatActivity {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction().replace(R.id.content_frame, currentFragment);
         fragmentTransaction.commit();
 
+        String mAuthUser = getIntent().getStringExtra("user");
+        String email = "email";
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
         View headerView = navigationView.getHeaderView(0);
 
+//        headerUsername = (TextView) headerView.findViewById(R.id.menu_username);
+//        headerUsername.setText(username);
 
-        // Create the AccountHeader
-//        AccountHeader headerResult = new AccountHeaderBuilder()
-//                .withActivity(this)
-//                .withHeaderBackground(R.drawable.background)
-//                .addProfiles(
-//                        new ProfileDrawerItem().withName("Mike Penz").withEmail("mikepenz@gmail.com").withIcon(GoogleMaterial.Icon.gmd_wb_sunny)
-//                )
-//                .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
-//                    @Override
-//                    public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile) {
-//                        return false;
-//                    }
-//                })
-//                .build();
+//         Create the AccountHeader
+        AccountHeader headerResult = new AccountHeaderBuilder()
+                .withActivity(this)
+                .withHeaderBackground(R.drawable.background)
+                .addProfiles(
+                        new ProfileDrawerItem().withName(mAuthUser).withEmail(email).withIcon(GoogleMaterial.Icon.gmd_wb_sunny)
+                )
+                .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
+                    @Override
+                    public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile) {
+                        openLogin();
+                        return false;
+                    }
+                })
+                .build();
 
         itemUno = new PrimaryDrawerItem()
                 .withIdentifier(1)
@@ -147,7 +155,7 @@ public class MainMenuActivity extends AppCompatActivity {
                 .withToolbar((Toolbar) findViewById(R.id.toolbar))
                 .withHasStableIds(true)
                 .withHeader(headerView)
-//                .withAccountHeader(headerResult) //set the AccountHeader we created earlier for the header
+                .withAccountHeader(headerResult) //set the AccountHeader we created earlier for the header
                 .addDrawerItems(
                         new SecondaryDrawerItem().withName("sezione Uno").withEnabled(false),
                         itemUno,
@@ -298,7 +306,7 @@ public class MainMenuActivity extends AppCompatActivity {
 
     private void openTre() {
 
-        openLogin();
+//        openLogin();
 //         Intent i = new Intent(this, GoogleSignInActivity.class);
 //        startActivity(i);
 //        Intent i = new Intent(this, FusedLocationActivity.class);

@@ -1,16 +1,12 @@
-package com.example.androidgeotest.activities;
+package com.example.androidgeotest.activities.running;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.PersistableBundle;
 import android.os.SystemClock;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -27,7 +23,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.androidgeotest.R;
-import com.example.androidgeotest.activities.Chronometer.MyChronometer;
 import com.example.androidgeotest.activities.business.CrudException;
 import com.example.androidgeotest.activities.business.RaceService;
 import com.example.androidgeotest.activities.business.model.Race;
@@ -46,7 +41,6 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -60,7 +54,6 @@ import java.util.Calendar;
 import java.util.List;
 
 import fr.quentinklein.slt.LocationTracker;
-import fr.quentinklein.slt.TrackerSettings;
 
 /**
  * Created by r.sciamanna on 11/05/2016.
@@ -368,7 +361,7 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
 
 
     public void setFinish(List<Location> locations, Race race){
-        //race.setTrip(new Gson().toJson(locations));
+        race.setTrip(new Gson().toJson(locations));
         race.setTotalDuration(
                 locations.get(locations.size()-1).getElapsedRealtimeNanos()-locations.get(0).getElapsedRealtimeNanos());
         race.setTotalDistace(calculateDistance(locations));

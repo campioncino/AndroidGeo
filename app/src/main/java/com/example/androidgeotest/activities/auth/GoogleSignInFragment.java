@@ -221,7 +221,7 @@ public class GoogleSignInFragment extends BaseFragment implements GoogleApiClien
     // [END auth_with_google]
 
     // [START signin]
-    private void signIn() {
+    public void signIn() {
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent, RC_SIGN_IN);
 //        signOutDisconnectLayout.setVisibility(View.VISIBLE);
@@ -264,9 +264,9 @@ public class GoogleSignInFragment extends BaseFragment implements GoogleApiClien
             signInBtn.setVisibility(View.GONE);
             signOutDisconnectLayout.setVisibility(View.VISIBLE);
 
-            Intent resultIntent = new Intent();
-            resultIntent.putExtra("googleAccount","stocazzo");
-            getActivity().setResult(100,resultIntent);
+//            Intent resultIntent = new Intent();
+//            resultIntent.putExtra("googleAccount","stocazzo");
+//            getActivity().setResult(100,resultIntent);
         } else {
             mStatusTextView.setText(R.string.signed_out);
             mDetailTextView.setText(null);
