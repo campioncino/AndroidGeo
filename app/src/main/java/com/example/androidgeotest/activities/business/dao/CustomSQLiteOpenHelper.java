@@ -22,7 +22,7 @@ public class CustomSQLiteOpenHelper extends OrmLiteSqliteOpenHelper {
 
     // name of the database file for your application -- change to something
     // appropriate for your app
-    private static String DATABASE_NAME = "mydatabase.db";
+    private static String DATABASE_NAME = "database.db";
 
     //TABLE RACE DATA
     private static final String RACE_TABLE_NAME = "RACE";
@@ -31,20 +31,23 @@ public class CustomSQLiteOpenHelper extends OrmLiteSqliteOpenHelper {
     private static final String RACE_COL_STOP = "STOP";
     private static final String RACE_COL_DURATION = "DURATION";
     private static final String RACE_COL_DISTANCE = "DISTANCE";
-    private static final String RACE_COL_TRACK = "TRACK";
+    private static final String RACE_COL_TRACK = "RACE_TRACK";
+
+
+    private static final String CREATE_RACE_TABLE = "CREATE TABLE IF NOT EXISTS " + RACE_TABLE_NAME + "( "+RACE_COL_ID+" INTEGER PRIMARY KEY AUTOINCREMENT, "+RACE_COL_START+" DATE, "+RACE_COL_STOP+" DATE, "+RACE_COL_DISTANCE+" TEXT, " +RACE_COL_DURATION+" LONG, "+RACE_COL_TRACK+" LONG )";
 
     // any time you make changes to your database, you may have to increase the
     // database version
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     public CustomSQLiteOpenHelper(Context context) {
         super(context, whichDatabase(), null, DATABASE_VERSION);
-//        boolean dbexist = isDatabaseExistent(context);
+        boolean dbexist = isDatabaseExistent(context);
         Log.wtf("databaseHelper", "creazione");
-//        if (!dbexist) {
-//            Log.d("prova", "provo a copiare");
-//            copyFiles(context);
-//        }
+        if (!dbexist) {
+            Log.d("prova", "provo a copiare");
+            copyFiles(context);
+        }
 
 
     }
@@ -57,7 +60,7 @@ public class CustomSQLiteOpenHelper extends OrmLiteSqliteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase database,
                          ConnectionSource connectionSource) {
-        String CREATE_RACE_TABLE = "CREATE TABLE IF NOT EXISTS " + DATABASE_NAME + "( RACE_ID INTEGER PRIMARY KEY AUTOINCREMENT KEY_START DATE  KEY_STOP DATE KEY_DISTANCE  TEXT  KEY_DURATION TEXT KEY_RACE_TRACK TEXT )";
+
     }
 
     @Override
@@ -114,4 +117,6 @@ public class CustomSQLiteOpenHelper extends OrmLiteSqliteOpenHelper {
             e.printStackTrace();
         }
     }
+
+
 }

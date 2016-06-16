@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import com.example.androidgeotest.R;
 import com.example.androidgeotest.activities.business.CrudException;
+import com.example.androidgeotest.activities.business.EntityService;
 import com.example.androidgeotest.activities.business.RaceService;
 import com.example.androidgeotest.activities.business.model.Race;
 
@@ -352,7 +353,7 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
             draw(locationList);
             setFinish(locationList,myRace);
             try {
-                raceService.insert(myRace);
+               raceService.insert(myRace);
             } catch (CrudException e) {
                 e.printStackTrace();
             }
@@ -361,10 +362,11 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
 
 
     public void setFinish(List<Location> locations, Race race){
-        race.setTrip(new Gson().toJson(locations));
+        //race.setTrip(new Gson().toJson(locations));
         race.setTotalDuration(
-                locations.get(locations.size()-1).getElapsedRealtimeNanos()-locations.get(0).getElapsedRealtimeNanos());
-        race.setTotalDistace(calculateDistance(locations));
+                (long) (locations.get(locations.size()-1).getElapsedRealtimeNanos()-locations.get(0).getElapsedRealtimeNanos()));
+        race.setTotalDistace((long) calculateDistance(locations));
+
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("Race");
 

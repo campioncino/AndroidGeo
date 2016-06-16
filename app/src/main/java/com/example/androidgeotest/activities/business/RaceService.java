@@ -10,6 +10,7 @@ import com.example.androidgeotest.activities.business.model.Race;
  */
 
 public class RaceService extends EntityService {
+
     public RaceService(Context context) {
         super(context);
     }

@@ -24,8 +24,8 @@ public class RaceMapper extends EntityMapper {
         CustomSQLiteOpenHelper helper = OpenHelperManager.getHelper(context,
                 CustomSQLiteOpenHelper.class);
         try {
-            Dao<Race, Integer> truckExtDao = helper.getDao(Race.class);
-            setWiewDao(truckExtDao);
+            Dao<Race, Integer> raceDao = helper.getDao(Race.class);
+            setWiewDao(raceDao);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -37,8 +37,8 @@ public class RaceMapper extends EntityMapper {
         CustomSQLiteOpenHelper helper = OpenHelperManager.getHelper(context,
                 CustomSQLiteOpenHelper.class);
         try {
-            Dao<Race, Integer> truckDao = helper.getDao(Race.class);
-            setTableDao(truckDao);
+            Dao<Race, Integer> raceDao = helper.getDao(Race.class);
+            setTableDao(raceDao);
         } catch (SQLException e) {
             e.printStackTrace();
         }

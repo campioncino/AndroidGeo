@@ -80,11 +80,11 @@ public abstract class EntityService {
     }
     public void insert(Entity entity) throws CrudException {
         try {
-            beforeInsertValidation(entity);
+           // beforeInsertValidation(entity);
             getMapper().insert(entity);
-        } catch (ValidationException e) {
-            e.printStackTrace();
-            throw new CrudException(e);
+//        } catch (ValidationException e) {
+//            e.printStackTrace();
+//            throw new CrudException(e);
         } catch (SQLException e) {
             e.printStackTrace();
             throw new CrudException(e);

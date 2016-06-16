@@ -13,6 +13,7 @@ import android.util.Log;
 import com.example.androidgeotest.R;
 import com.example.androidgeotest.activities.auth.GoogleSignInActivity;
 import com.example.androidgeotest.activities.auth.GoogleSignInFragment;
+import com.example.androidgeotest.activities.business.dao.DatabaseHelper;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
@@ -30,7 +31,7 @@ public class LoginActivity extends AppCompatActivity {
     GoogleApiClient googleApiClient;
 
 
-    String mAuthUser;
+    FirebaseUser mAuthUser;
 
     private Fragment currentFragment;
     private CoordinatorLayout coordinatorLayout;
@@ -39,11 +40,14 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_layout);
-        mAuthUser = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+
+
+        mAuthUser = FirebaseAuth.getInstance().getCurrentUser();
 
         if(mAuthUser!=null){
             Intent i = new Intent(this,MainMenuActivity.class);
-            i.putExtra("user",mAuthUser);
+            i.putExtra("user",mAuthUser.getDisplayName());
+            i.putExtra("email",mAuthUser.getEmail());
             startActivity(i);
         }else{
 //            System.out.println("MAUTH = "+mAuth.getCurrentUser().toString());
@@ -62,6 +66,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
     }
+
 
 }
 

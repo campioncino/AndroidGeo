@@ -94,8 +94,8 @@ public class MainMenuActivity extends AppCompatActivity {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction().replace(R.id.content_frame, currentFragment);
         fragmentTransaction.commit();
 
-        String mAuthUser = getIntent().getStringExtra("user");
-        String email = "email";
+        String user = getIntent().getStringExtra("user");
+        String email = getIntent().getStringExtra("email");
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
         View headerView = navigationView.getHeaderView(0);
 
@@ -107,7 +107,7 @@ public class MainMenuActivity extends AppCompatActivity {
                 .withActivity(this)
                 .withHeaderBackground(R.drawable.background)
                 .addProfiles(
-                        new ProfileDrawerItem().withName(mAuthUser).withEmail(email).withIcon(GoogleMaterial.Icon.gmd_wb_sunny)
+                        new ProfileDrawerItem().withName(user).withEmail(email).withIcon(GoogleMaterial.Icon.gmd_wb_sunny)
                 )
                 .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
                     @Override

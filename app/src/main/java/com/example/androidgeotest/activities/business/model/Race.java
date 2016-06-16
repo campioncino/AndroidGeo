@@ -4,6 +4,7 @@ import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -21,19 +22,19 @@ public class Race extends Entity{
     @DatabaseField(columnName = "RACE_ID", generatedId = true)
     public Integer raceId;
 
-    @DatabaseField(columnName = "START")
+    @DatabaseField(columnName = "START", canBeNull = true, dataType= DataType.DATE_STRING,format="dd-MM-yyyy HH:mm:ss")
     public Date start;
 
-    @DatabaseField(columnName = "STOP")
+    @DatabaseField(columnName = "STOP", canBeNull = true, dataType=DataType.DATE_STRING,format="dd-MM-yyyy HH:mm:ss")
     public Date stop;
 
-    @DatabaseField(columnName = "DISTANCE")
-    public float totalDistace;
+    @DatabaseField(columnName = "DISTANCE", canBeNull = true)
+    public Long totalDistace;
 
-    @DatabaseField(columnName = "DURATION")
-    public double totalDuration;
+    @DatabaseField(columnName = "DURATION", canBeNull = true)
+    public Long totalDuration;
 
-    @DatabaseField(columnName = "RACE_TRACK")
+    @DatabaseField(columnName = "RACE_TRACK", canBeNull = true)
     public String trip;
 
     public Integer getRaceId() {
@@ -60,19 +61,19 @@ public class Race extends Entity{
         this.stop = stop;
     }
 
-    public float getTotalDistace() {
+    public Long getTotalDistace() {
         return totalDistace;
     }
 
-    public void setTotalDistace(float totalDistace) {
+    public void setTotalDistace(Long totalDistace) {
         this.totalDistace = totalDistace;
     }
 
-    public double getTotalDuration() {
+    public Long getTotalDuration() {
         return totalDuration;
     }
 
-    public void setTotalDuration(double totalDuration) {
+    public void setTotalDuration(Long totalDuration) {
         this.totalDuration = totalDuration;
     }
 
@@ -96,22 +97,22 @@ public class Race extends Entity{
         super.writeToParcel(dest, flags);
 
         dest.writeValue(this.raceId);
-        dest.writeValue(this.trip);
         dest.writeValue(this.start);
         dest.writeValue(this.stop);
         dest.writeValue(this.totalDistace);
         dest.writeValue(this.totalDuration);
+        dest.writeValue(this.trip);
 
     }
 
     public void readFromParcel(Parcel in) {
         super.readFromParcel(in);
         this.raceId = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.trip = (String) in.readValue(String.class.getClassLoader());
         this.start = (Date) in.readValue(Date.class.getClassLoader());
         this.stop = (Date) in.readValue(Date.class.getClassLoader());
-        this.totalDistace = (float) in.readValue(Double.class.getClassLoader());
-        this.totalDuration = (Double) in.readValue(Double.class.getClassLoader());
+        this.totalDistace = (Long) in.readValue(Long.class.getClassLoader());
+        this.totalDuration = (Long) in.readValue(Long.class.getClassLoader());
+        this.trip = (String) in.readValue(String.class.getClassLoader());
     }
 
     public static final Parcelable.Creator<Race> CREATOR = new Parcelable.Creator<Race>() {
