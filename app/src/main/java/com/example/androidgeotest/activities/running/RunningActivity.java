@@ -23,11 +23,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.androidgeotest.R;
-import com.example.androidgeotest.activities.business.CrudException;
-import com.example.androidgeotest.activities.business.EntityService;
-import com.example.androidgeotest.activities.business.RaceService;
-import com.example.androidgeotest.activities.business.model.Race;
 
+import com.example.androidgeotest.activities.Code;
+import com.example.androidgeotest.activities.business.model.FreezerLocation;
+import com.example.androidgeotest.activities.business.model.FreezerRace;
+import com.example.androidgeotest.activities.business.model.FreezerRaceEntityManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -55,6 +55,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import fr.quentinklein.slt.LocationTracker;
+import fr.xebia.android.freezer.Freezer;
 
 /**
  * Created by r.sciamanna on 11/05/2016.
@@ -63,7 +64,7 @@ import fr.quentinklein.slt.LocationTracker;
 
 public class RunningActivity extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
-
+    private FreezerRace myrace;
     private Fragment mapFragment;
     final static String TAG = RunningActivity.class.getSimpleName();
     private Handler mHandler = new Handler();
@@ -75,15 +76,13 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
     private IconicsButton btnLock;
     private Chronometer chronometer;
 
-    private Race myRace;
-
     double kmValueWhenStopped = 0.000;
     double kcalValueWhenStopped = 0.000;
     private LocationTracker locationTracker;
     private Location location;
 
     private static List<Location> locationList = new ArrayList<Location>();
-
+    private static List<FreezerLocation> freezerocationList = new ArrayList<FreezerLocation>();
     private TextView kcalText;
     private TextView kmText;
     private long timeWhenStopped = 0;
@@ -103,11 +102,9 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
 
     private View myChronometerLayout;
 
-    public RaceService raceService;
-
+    FreezerRaceEntityManager fRaceEm = new FreezerRaceEntityManager();
 
     public DatabaseReference rootRef;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,7 +112,7 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
 
         /* mi setto sul mio firebase db */
         rootRef = FirebaseDatabase.getInstance()
-                .getReferenceFromUrl("https://androidgeotest-6915a.firebaseio.com/");
+                .getReferenceFromUrl(Code.FIREBASE_DB);
 
         setContentView(R.layout.running_activity_layout);
 //        AndroidBug5497Workaround.assistActivity(this);
@@ -129,7 +126,6 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
 //        mapFragment = new MapFragment();
 //        getSupportFragmentManager().beginTransaction()
 //                .replace(R.id.map_fragment, mapFragment).commit();
-        raceService = new RaceService(this);
         CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle("Attività");
@@ -215,22 +211,18 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void doFirstStart() {
+        myrace = new FreezerRace();
         initChrono();
-        myRace = new Race();
         polylineOptions = new PolylineOptions();
         mGoogleMap.clear();
         Calendar c = Calendar.getInstance();
         SimpleDateFormat dateformat = new SimpleDateFormat("dd-MMM-yyyy hh:mm:ss");
-        try {
-            myRace.setStart(dateformat.parse(c.getTime().toString()));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
         kmText.setText(String.valueOf(kmValueWhenStopped));
         chronometer.setBase(SystemClock.elapsedRealtime()
                 + timeWhenStopped);
         chronometer.start();
         locationList.clear();
+        freezerocationList.clear();
         amIrunning = true;
         mHandler.postDelayed(updateTask, 2000);
 
@@ -343,35 +335,27 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
         btnReStart.setVisibility(View.GONE);
         Calendar c = Calendar.getInstance();
         SimpleDateFormat dateformat = new SimpleDateFormat("dd-MMM-yyyy hh:mm:ss");
-        try {
-            myRace.setStop(dateformat.parse(c.getTime().toString()));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
         if (!locationList.isEmpty()) {
             Log.wtf("locationList", "elementi " + locationList.size());
             draw(locationList);
-            setFinish(locationList,myRace);
-            try {
-               raceService.insert(myRace);
-            } catch (CrudException e) {
-                e.printStackTrace();
-            }
+            setFinish(freezerocationList,myrace);
         }
     }
 
 
-    public void setFinish(List<Location> locations, Race race){
-        //race.setTrip(new Gson().toJson(locations));
-        race.setTotalDuration(
-                (long) (locations.get(locations.size()-1).getElapsedRealtimeNanos()-locations.get(0).getElapsedRealtimeNanos()));
-        race.setTotalDistace((long) calculateDistance(locations));
+    public void setFinish(List<FreezerLocation> locations, FreezerRace race){
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("Race");
 
-        myRef.setValue(race);
         //rootRef.setValue(race);
+
+        myrace.setRaceId(2);
+
+        race.setLocations(locations);
+        fRaceEm.add(race);
+
+        myRef.setValue(race);
     }
 
     public float calculateDistance(List<Location> locations){
@@ -498,12 +482,13 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
         //zoom to current position:
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(latLng).zoom(16).build();
-
+        FreezerLocation tmp = new FreezerLocation(location);
         mGoogleMap.animateCamera(CameraUpdateFactory
                 .newCameraPosition(cameraPosition));
         if(amIrunning) {
             Log.wtf("On locationChanged latLng", latLng.toString());
             locationList.add(location);
+            freezerocationList.add(tmp);
         }
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling

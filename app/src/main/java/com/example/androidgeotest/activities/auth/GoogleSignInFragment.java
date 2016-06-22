@@ -4,8 +4,11 @@ package com.example.androidgeotest.activities.auth;
  * Created by r.sciamanna on 14/06/2016.
  */
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -18,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.androidgeotest.R;
+import com.example.androidgeotest.activities.Code;
 import com.example.androidgeotest.activities.MainMenuActivity;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -45,8 +49,9 @@ public class GoogleSignInFragment extends BaseFragment implements GoogleApiClien
 //        GoogleApiClient.OnConnectionFailedListener,
 //        View.OnClickListener {
 
-    private static final String TAG = "GoogleActivity";
+    private static final String TAG = "GoogleSignInFragment";
     private static final int RC_SIGN_IN = 9001;
+    private static final int SIGNED_IN = 9002;
 
     // [START declare_auth]
     private FirebaseAuth mAuth;
@@ -66,7 +71,7 @@ public class GoogleSignInFragment extends BaseFragment implements GoogleApiClien
 
     private LinearLayout signOutDisconnectLayout;
 
-    
+    private GoogleSignInAccount googleSignInAccount;
     private View fragmentView;
 
 
@@ -173,10 +178,9 @@ public class GoogleSignInFragment extends BaseFragment implements GoogleApiClien
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             if (result.isSuccess()) {
                 // Google Sign In was successful, authenticate with Firebase
-                GoogleSignInAccount account = result.getSignInAccount();
-                firebaseAuthWithGoogle(account);
-                Intent i = new Intent(getActivity(),MainMenuActivity.class);
-                startActivity(i);
+                googleSignInAccount= result.getSignInAccount();
+                firebaseAuthWithGoogle(googleSignInAccount);
+                Log.wtf("Auth success","fine");
             } else {
                 Log.wtf("auth","login failed");
                 // Google Sign In failed, update UI appropriately
@@ -190,9 +194,9 @@ public class GoogleSignInFragment extends BaseFragment implements GoogleApiClien
 
     // [START auth_with_google]
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
-        Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
+        Log.wtf(TAG, "firebaseAuthWithGoogle:" + acct.getId());
         // [START_EXCLUDE silent]
-        showProgressDialog();
+//        showProgressDialog();
         // [END_EXCLUDE]
 
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
@@ -200,20 +204,25 @@ public class GoogleSignInFragment extends BaseFragment implements GoogleApiClien
                 .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        Log.d(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
-
+                        Log.wtf(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
+                        Intent i = new Intent();
+                        i.putExtra("account",googleSignInAccount);
+                        getActivity().setResult(SIGNED_IN,i);
+                       // getActivity().finish();
+                        Log.wtf(TAG, "trallalla");
                         // If sign in fails, display a message to the user. If sign in succeeds
                         // the auth state listener will be notified and logic to handle the
                         // signed in user can be handled in the listener.
+
                         if (!task.isSuccessful()) {
-                            Log.w(TAG, "signInWithCredential", task.getException());
+                            Log.wtf(TAG, "signInWithCredential", task.getException());
                             Toast.makeText(getActivity(), "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         }
                         // [START_EXCLUDE]
-                        hideProgressDialog();
+                       // hideProgressDialog();
                         // [END_EXCLUDE]
-
+                        getActivity().finish();
 
                     }
                 });
@@ -264,9 +273,7 @@ public class GoogleSignInFragment extends BaseFragment implements GoogleApiClien
             signInBtn.setVisibility(View.GONE);
             signOutDisconnectLayout.setVisibility(View.VISIBLE);
 
-//            Intent resultIntent = new Intent();
-//            resultIntent.putExtra("googleAccount","stocazzo");
-//            getActivity().setResult(100,resultIntent);
+
         } else {
             mStatusTextView.setText(R.string.signed_out);
             mDetailTextView.setText(null);
@@ -289,9 +296,12 @@ public class GoogleSignInFragment extends BaseFragment implements GoogleApiClien
         switch (v.getId()) {
             case R.id.sign_in_button:
                 signIn();
+
                 break;
             case R.id.sign_out_button:
                 signOut();
+                getActivity().setResult(9999);
+                getActivity().finish();
                 break;
             case R.id.disconnect_button:
                 revokeAccess();

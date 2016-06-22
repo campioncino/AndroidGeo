@@ -1,4 +1,4 @@
-package com.example.androidgeotest.activities.business;
+package com.example.androidgeotest.activities.exceptions;
 
 public class ValidationException extends Exception {
 

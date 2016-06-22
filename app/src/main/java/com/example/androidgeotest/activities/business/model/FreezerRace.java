@@ -4,38 +4,31 @@ import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.j256.ormlite.field.DataType;
-import com.j256.ormlite.field.DatabaseField;
-import com.j256.ormlite.field.ForeignCollectionField;
-import com.j256.ormlite.table.DatabaseTable;
-
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
+import java.util.List;
+
+import fr.xebia.android.freezer.annotations.Id;
+import fr.xebia.android.freezer.annotations.Model;
 
 /**
- * Created by r.sciamanna on 06/06/2016.
+ * Created by r.sciamanna on 20/06/2016.
  */
-@DatabaseTable(tableName = "RACE")
-public class Race extends Entity{
+@Model
+public class FreezerRace implements Parcelable {
 
-    @DatabaseField(columnName = "RACE_ID", generatedId = true)
+    @Id
     public Integer raceId;
-
-    @DatabaseField(columnName = "START", canBeNull = true, dataType= DataType.DATE_STRING,format="dd-MM-yyyy HH:mm:ss")
     public Date start;
-
-    @DatabaseField(columnName = "STOP", canBeNull = true, dataType=DataType.DATE_STRING,format="dd-MM-yyyy HH:mm:ss")
     public Date stop;
-
-    @DatabaseField(columnName = "DISTANCE", canBeNull = true)
     public Long totalDistace;
-
-    @DatabaseField(columnName = "DURATION", canBeNull = true)
     public Long totalDuration;
 
-    @DatabaseField(columnName = "RACE_TRACK", canBeNull = true)
-    public String trip;
+    public List<FreezerLocation> locations ;
+
+    public FreezerRace() {
+        super();
+    }
 
     public Integer getRaceId() {
         return raceId;
@@ -77,53 +70,50 @@ public class Race extends Entity{
         this.totalDuration = totalDuration;
     }
 
-    public String getTrip() {
-        return trip;
+    public List<FreezerLocation> getLocations() {
+        return locations;
     }
 
-    public void setTrip(String trip) {
-        this.trip = trip;
+    public void setLocations(List<FreezerLocation> locations) {
+        this.locations = locations;
     }
 
-    public Race() {
-        super();
+    public FreezerRace(Parcel in) {
+        readFromParcel(in);
     }
-
-    public Race(Parcel in) {
-        super(in);
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public void writeToParcel(Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
 
         dest.writeValue(this.raceId);
         dest.writeValue(this.start);
         dest.writeValue(this.stop);
         dest.writeValue(this.totalDistace);
         dest.writeValue(this.totalDuration);
-        dest.writeValue(this.trip);
+        dest.writeTypedList(this.locations);
 
     }
 
     public void readFromParcel(Parcel in) {
-        super.readFromParcel(in);
         this.raceId = (Integer) in.readValue(Integer.class.getClassLoader());
         this.start = (Date) in.readValue(Date.class.getClassLoader());
         this.stop = (Date) in.readValue(Date.class.getClassLoader());
         this.totalDistace = (Long) in.readValue(Long.class.getClassLoader());
         this.totalDuration = (Long) in.readValue(Long.class.getClassLoader());
-        this.trip = (String) in.readValue(String.class.getClassLoader());
+        in.readTypedList(this.locations,FreezerLocation.CREATOR);
     }
 
-    public static final Parcelable.Creator<Race> CREATOR = new Parcelable.Creator<Race>() {
-        public Race createFromParcel(Parcel source) {
-            return new Race(source);
+
+    public static final Creator<FreezerRace> CREATOR = new Creator<FreezerRace>() {
+        public FreezerRace createFromParcel(Parcel source) {
+            return new FreezerRace(source);
         }
 
-        public Race[] newArray(int size) {
-            return new Race[size];
+        public FreezerRace[] newArray(int size) {
+            return new FreezerRace[size];
         }
     };
-
-
 }

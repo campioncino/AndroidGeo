@@ -24,10 +24,9 @@ import android.widget.Toast;
 
 import com.example.androidgeotest.R;
 import com.example.androidgeotest.activities.auth.GoogleSignInFragment;
-import com.example.androidgeotest.activities.business.dao.CustomSQLiteOpenHelper;
-import com.example.androidgeotest.activities.business.dao.DatabaseHelper;
 import com.example.androidgeotest.activities.running.RunningActivity;
 import com.facebook.stetho.Stetho;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -45,6 +44,8 @@ import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
+
+import fr.xebia.android.freezer.Freezer;
 
 
 public class MainMenuActivity extends AppCompatActivity {
@@ -73,16 +74,13 @@ public class MainMenuActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //vediamo se funziona questo
+
+        //freezer dao
+        Freezer.onCreate(getApplication());
+
+        //Bridge chrome
         Stetho.initializeWithDefaults(this);
-        if(DatabaseHelper.isDatabaseExistent(this)){
-            DatabaseHelper.clearDatabase(this);
-            Log.wtf("MainMenu","database esistente");
-        }
-        else{
-            Log.wtf("MainMenu","database NON esistente");
-            CustomSQLiteOpenHelper db = new CustomSQLiteOpenHelper(this);
-        }
+
         setContentView(R.layout.mainmenu);
         initToolbar();
 
@@ -94,8 +92,23 @@ public class MainMenuActivity extends AppCompatActivity {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction().replace(R.id.content_frame, currentFragment);
         fragmentTransaction.commit();
 
-        String user = getIntent().getStringExtra("user");
-        String email = getIntent().getStringExtra("email");
+        GoogleSignInAccount gAccount = getIntent().getParcelableExtra("gAccount");
+        String fUser = getIntent().getStringExtra("fUser");
+        String fEmail = getIntent().getStringExtra("fEmail");
+        String user = "";/*getIntent().getStringExtra("user");*/
+        String email = "";/*getIntent().getStringExtra("email");*/
+        if(gAccount!=null){
+            user = gAccount.getDisplayName();
+            email = gAccount.getEmail();
+        }
+        if(fUser!=null){
+            user = fUser;
+        }
+        if(fEmail!=null){
+            email = fEmail;
+        }
+
+        Log.wtf("MainMenu",user+" "+email);
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
         View headerView = navigationView.getHeaderView(0);
 
@@ -280,7 +293,6 @@ public class MainMenuActivity extends AppCompatActivity {
     private void openMyGpsActivity() {
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             Log.wtf("MainActivity", "Location is Enabled");
-//            Intent i = new Intent(this, RunActivity.class);
             Intent i = new Intent(this, RunningActivity.class);
 
             startActivity(i);
@@ -330,6 +342,7 @@ public class MainMenuActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        Log.wtf("MainMenu,onResult", "request =" + requestCode + " result=" + resultCode);
         switch(requestCode){
             case GPS_REQUEST_CODE:
                 if(resultCode == 0){

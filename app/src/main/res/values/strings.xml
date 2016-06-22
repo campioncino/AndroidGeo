@@ -56,4 +56,7 @@
 
     <string name="id_fmt">User ID: %s</string>
     <string name="email_fmt">Email: %s</string>
+
+
+    <string name="datePattern">dd-MM-yyyy</string>
 </resources>
