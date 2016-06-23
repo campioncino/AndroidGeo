@@ -30,6 +30,11 @@ public class FreezerRace implements Parcelable {
         super();
     }
 
+    public FreezerRace(List<FreezerLocation> locations){
+        super();
+        this.raceId = locations.get(0).
+    }
+
     public Integer getRaceId() {
         return raceId;
     }
@@ -81,6 +86,7 @@ public class FreezerRace implements Parcelable {
     public FreezerRace(Parcel in) {
         readFromParcel(in);
     }
+
     @Override
     public int describeContents() {
         return 0;
