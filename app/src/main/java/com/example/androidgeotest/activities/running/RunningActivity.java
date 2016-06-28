@@ -354,7 +354,7 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
 
         race.setLocations(locations);
         fRaceEm.add(race);
-
+        myRef.push();
         myRef.setValue(race);
     }
 

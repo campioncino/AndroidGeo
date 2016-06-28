@@ -32,7 +32,6 @@ public class FreezerRace implements Parcelable {
 
     public FreezerRace(List<FreezerLocation> locations){
         super();
-        this.raceId = locations.get(0).
     }
 
     public Integer getRaceId() {

@@ -1,6 +1,8 @@
 package com.example.androidgeotest.activities;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
 import android.location.Criteria;
 import android.location.Geocoder;
@@ -11,6 +13,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -49,15 +52,14 @@ public class MyMapFragment extends SupportMapFragment implements GoogleApiClient
     private LocationManager locationManager;
     private String provider;
 
-    private final int[] MAP_TYPES = { GoogleMap.MAP_TYPE_SATELLITE,
+    private final int[] MAP_TYPES = {GoogleMap.MAP_TYPE_SATELLITE,
             GoogleMap.MAP_TYPE_NORMAL,
             GoogleMap.MAP_TYPE_HYBRID,
             GoogleMap.MAP_TYPE_TERRAIN,
-            GoogleMap.MAP_TYPE_NONE };
+            GoogleMap.MAP_TYPE_NONE};
     private int curMapTypeIndex = 0;
 
     CoordinatorLayout coordinatorLayout;
-
 
 
     @Override
@@ -66,10 +68,10 @@ public class MyMapFragment extends SupportMapFragment implements GoogleApiClient
 
         setHasOptionsMenu(true);
 
-        mGoogleApiClient = new GoogleApiClient.Builder( getActivity() )
-                .addConnectionCallbacks( this )
-                .addOnConnectionFailedListener( this )
-                .addApi( LocationServices.API )
+        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
                 .build();
 
 //        defaultLocation = (Location) getActivity().getIntent().getExtras().get("defaultLocation");
@@ -88,13 +90,23 @@ public class MyMapFragment extends SupportMapFragment implements GoogleApiClient
 //        getMap().setOnMapClickListener(this);
     }
 
-    public void startListening(){
+    public void startListening() {
         // Get the location manager
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         // Define the criteria how to select the locatioin provider -> use
         // default
         Criteria criteria = new Criteria();
         provider = locationManager.getBestProvider(criteria, false);
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
         defaultLocation = locationManager.getLastKnownLocation(provider);
 
         // Initialize the location fields
@@ -106,12 +118,12 @@ public class MyMapFragment extends SupportMapFragment implements GoogleApiClient
 
 
     private void removeListeners() {
-        if( getMap() != null ) {
-            getMap().setOnMarkerClickListener( null );
-            getMap().setOnMapLongClickListener(null);
-            getMap().setOnInfoWindowClickListener(null);
-            getMap().setOnMapClickListener(null);
-        }
+//        if( getMap() != null ) {
+//            getMap().setOnMarkerClickListener( null );
+//            getMap().setOnMapLongClickListener(null);
+//            getMap().setOnInfoWindowClickListener(null);
+//            getMap().setOnMapClickListener(null);
+//        }
     }
 
     @Override
@@ -120,20 +132,20 @@ public class MyMapFragment extends SupportMapFragment implements GoogleApiClient
         removeListeners();
     }
 
-    private void initCamera( Location location ) {
+    private void initCamera(Location location) {
         CameraPosition position = CameraPosition.builder()
-                .target( new LatLng( location.getLatitude(), location.getLongitude() ) )
-                .zoom( 16f )
-                .bearing( 0.0f )
-                .tilt( 0.0f )
+                .target(new LatLng(location.getLatitude(), location.getLongitude()))
+                .zoom(16f)
+                .bearing(0.0f)
+                .tilt(0.0f)
                 .build();
 
-        getMap().animateCamera( CameraUpdateFactory.newCameraPosition( position ), null );
-
-        getMap().setMapType( MAP_TYPES[curMapTypeIndex] );
-        getMap().setTrafficEnabled( true );
-        getMap().setMyLocationEnabled( true );
-        getMap().getUiSettings().setZoomControlsEnabled( true );
+//        getMap().animateCamera( CameraUpdateFactory.newCameraPosition( position ), null );
+//
+//        getMap().setMapType( MAP_TYPES[curMapTypeIndex] );
+//        getMap().setTrafficEnabled( true );
+//        getMap().setMyLocationEnabled( true );
+//        getMap().getUiSettings().setZoomControlsEnabled( true );
     }
 
     @Override
@@ -145,7 +157,7 @@ public class MyMapFragment extends SupportMapFragment implements GoogleApiClient
     @Override
     public void onStop() {
         super.onStop();
-        if( mGoogleApiClient != null && mGoogleApiClient.isConnected() ) {
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
     }
@@ -153,7 +165,17 @@ public class MyMapFragment extends SupportMapFragment implements GoogleApiClient
     @Override
     public void onConnected(Bundle bundle) {
 
-        mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation( mGoogleApiClient );
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if(mCurrentLocation==null){
             mCurrentLocation=defaultLocation;
         }
@@ -192,7 +214,7 @@ public class MyMapFragment extends SupportMapFragment implements GoogleApiClient
         options.title( getAddressFromLatLng( latLng ) );
 
         options.icon( BitmapDescriptorFactory.defaultMarker( ) );
-        getMap().addMarker( options );
+//        getMap().addMarker( options );
     }
 
     @Override
@@ -203,7 +225,7 @@ public class MyMapFragment extends SupportMapFragment implements GoogleApiClient
         options.icon( BitmapDescriptorFactory.fromBitmap(
                 BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher ) ) );
 
-        getMap().addMarker(options);
+//        getMap().addMarker(options);
     }
 
     private String getAddressFromLatLng( LatLng latLng ) {

@@ -1,11 +1,14 @@
 package com.example.androidgeotest.activities.Chronometer;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
@@ -33,7 +36,7 @@ import fr.quentinklein.slt.TrackerSettings;
 /**
  * Created by r.sciamanna on 03/05/2016.
  */
-public class MyChronometer extends Fragment implements View.OnClickListener{
+public class MyChronometer extends Fragment implements View.OnClickListener {
     final static String TAG = MyChronometer.class.getSimpleName();
     private Handler mHandler = new Handler();
     private Button btnStart;
@@ -60,7 +63,7 @@ public class MyChronometer extends Fragment implements View.OnClickListener{
     private int viewId;
 
     private View myView;
-
+    private Context myContext;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -74,7 +77,7 @@ public class MyChronometer extends Fragment implements View.OnClickListener{
         myView = inflater.inflate(R.layout.mychronometer_layout, container, false);
         mbundle = getArguments();
 
-
+        myContext = this.getContext();
         myChronometer = (Chronometer) myView.findViewById(R.id.mychronometer);
 //        myChronometer.setText("00:00:00");
 
@@ -290,7 +293,7 @@ public class MyChronometer extends Fragment implements View.OnClickListener{
         chronometer.setBase(SystemClock.elapsedRealtime()
                 + timeWhenStopped);
         chronometer.start();
-        startLocationTracker(getActivity());
+        startLocationTracker(myContext);
 
         mHandler.postDelayed(updateTask, 2000);
 
@@ -304,6 +307,7 @@ public class MyChronometer extends Fragment implements View.OnClickListener{
     }
 
     private void startLocationTracker(Context context) {
+        Log.wtf("startLocationTracker","Entro");
         TrackerSettings settings =
                 new TrackerSettings()
                         .setUseGPS(true)
@@ -312,10 +316,20 @@ public class MyChronometer extends Fragment implements View.OnClickListener{
                         //update every 30 mins
 //                        .setTimeBetweenUpdates(30 * 60 * 1000)
                         //update every 3 seconds
-                        .setTimeBetweenUpdates(3*1000);
+                        .setTimeBetweenUpdates(3 * 1000);
 //        update every 100 mt
 //                        .setMetersBetweenUpdates(100);
 
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
         LocationTracker tracker = new LocationTracker(context, settings) {
 
             @Override

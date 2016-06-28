@@ -25,7 +25,6 @@ import android.widget.Toast;
 import com.example.androidgeotest.R;
 import com.example.androidgeotest.activities.auth.GoogleSignInFragment;
 import com.example.androidgeotest.activities.running.RunningActivity;
-import com.facebook.stetho.Stetho;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.auth.FirebaseAuth;
@@ -77,9 +76,6 @@ public class MainMenuActivity extends AppCompatActivity {
 
         //freezer dao
         Freezer.onCreate(getApplication());
-
-        //Bridge chrome
-        Stetho.initializeWithDefaults(this);
 
         setContentView(R.layout.mainmenu);
         initToolbar();
