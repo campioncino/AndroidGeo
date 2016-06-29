@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import com.example.androidgeotest.R;
 import com.example.androidgeotest.activities.auth.GoogleSignInFragment;
+import com.example.androidgeotest.activities.excursion.ExcursionActivity;
 import com.example.androidgeotest.activities.running.RunningActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -93,18 +94,18 @@ public class MainMenuActivity extends AppCompatActivity {
         String fEmail = getIntent().getStringExtra("fEmail");
         String user = "";/*getIntent().getStringExtra("user");*/
         String email = "";/*getIntent().getStringExtra("email");*/
-        if(gAccount!=null){
+        if (gAccount != null) {
             user = gAccount.getDisplayName();
             email = gAccount.getEmail();
         }
-        if(fUser!=null){
+        if (fUser != null) {
             user = fUser;
         }
-        if(fEmail!=null){
+        if (fEmail != null) {
             email = fEmail;
         }
 
-        Log.wtf("MainMenu",user+" "+email);
+        Log.wtf("MainMenu", user + " " + email);
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
         View headerView = navigationView.getHeaderView(0);
 
@@ -218,7 +219,7 @@ public class MainMenuActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int id) {
                                 Intent callGPSSettingIntent = new Intent(
                                         android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                                startActivityForResult(callGPSSettingIntent,GPS_REQUEST_CODE);
+                                startActivityForResult(callGPSSettingIntent, GPS_REQUEST_CODE);
                             }
                         });
         alertDialogBuilder.setNegativeButton("Cancel",
@@ -292,8 +293,7 @@ public class MainMenuActivity extends AppCompatActivity {
             Intent i = new Intent(this, RunningActivity.class);
 
             startActivity(i);
-        }
-        else{
+        } else {
 //            Log.wtf("MainActivity","Location is NOT Enabled");
             checkGpsEnabled();
         }
@@ -301,9 +301,9 @@ public class MainMenuActivity extends AppCompatActivity {
 
     private void openDue() {
 //        Intent i = new Intent(this, TestMapActivity.class);
-        Intent i = new Intent(this, MapLocationActivity.class);
-
-        startActivity(i);
+//        Intent i = new Intent(this, MapLocationActivity.class);
+//
+//        startActivity(i);
 //        currentFragment = new MyMapFragment();
 //        FragmentManager fragmentManager = getSupportFragmentManager();
 //        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction().replace(R.id.content_frame,currentFragment);
@@ -313,7 +313,8 @@ public class MainMenuActivity extends AppCompatActivity {
     }
 
     private void openTre() {
-
+        Intent i = new Intent(this, ExcursionActivity.class);
+        startActivity(i);
 //        openLogin();
 //         Intent i = new Intent(this, GoogleSignInActivity.class);
 //        startActivity(i);
@@ -339,21 +340,21 @@ public class MainMenuActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Log.wtf("MainMenu,onResult", "request =" + requestCode + " result=" + resultCode);
-        switch(requestCode){
+        switch (requestCode) {
             case GPS_REQUEST_CODE:
-                if(resultCode == 0){
+                if (resultCode == 0) {
                     locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-                    Log.wtf("MainMenu","activity result code ="+resultCode);
+                    Log.wtf("MainMenu", "activity result code =" + resultCode);
                     if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                         Toast.makeText(this, "GPS is Enabled in your devide", Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(this,"GPS is MANDATORY",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "GPS is MANDATORY", Toast.LENGTH_SHORT).show();
                         showGPSDisabledAlertToUser();
                     }
                 }
                 break;
             default:
-                System.out.println("on activity result:\nresultCode:"+resultCode+"\nrequestCode:"+requestCode);
+                System.out.println("on activity result:\nresultCode:" + resultCode + "\nrequestCode:" + requestCode);
                 break;
         }
 //        if(requestCode == GPS_REQUEST_CODE && resultCode == 0){
@@ -372,7 +373,7 @@ public class MainMenuActivity extends AppCompatActivity {
 
     }
 
-    private void checkGpsEnabled(){
+    private void checkGpsEnabled() {
         //check if gps is enabled or not
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {

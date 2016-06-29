@@ -1,0 +1,172 @@
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:fitsSystemWindows="true"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/collapsing_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true"
+            custom:contentScrim="?attr/colorPrimary"
+            custom:expandedTitleMarginEnd="10dp"
+            custom:expandedTitleMarginStart="10dp"
+            custom:layout_scrollFlags="scroll|exitUntilCollapsed">
+
+            <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/main_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                custom:layout_collapseMode="pin"
+                custom:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
+            <LinearLayout
+                android:id="@+id/main_toolbar_ll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="?attr/actionBarSize"
+                android:fitsSystemWindows="true"
+                android:orientation="vertical"
+                android:paddingTop="10dp"
+                custom:layout_collapseMode="parallax"
+                custom:layout_collapseParallaxMultiplier="0"
+                custom:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tipo" />
+
+                    <TextView
+                        android:id="@+id/wizard_ricettaTipo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:text="PresVet" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Data" />
+
+                    <TextView
+                        android:id="@+id/wizard_ricettaDataPres"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:text="12/15/2016" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Stato" />
+
+                    <TextView
+                        android:id="@+id/wizard_ricettaStato"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:text="Iniziale" />
+                </LinearLayout>
+            </LinearLayout>
+
+        </android.support.design.widget.CollapsingToolbarLayout>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="fill_vertical"
+        android:fillViewport="true"
+        custom:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <!--<android.support.v4.widget.NestedScrollView-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:orientation="vertical">-->
+
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <android.support.v7.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    custom:cardCornerRadius="0dp"
+                    custom:cardElevation="5dp"
+                    custom:cardUseCompatPadding="true">
+
+                    <!--<FrameLayout-->
+                        <!--android:id="@+id/chrono_fragment"-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:fitsSystemWindows="true">-->
+
+                    <!--</FrameLayout>-->
+
+                    <include
+                        android:id="@+id/myExcursionPanelLayout"
+                        layout="@layout/myexcursionpanel_layout"></include>
+
+                </android.support.v7.widget.CardView>
+
+                <android.support.v7.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    custom:cardCornerRadius="0dp"
+                    custom:cardElevation="5dp"
+                    custom:cardUseCompatPadding="true">
+
+                    <!--<FrameLayout-->
+                        <!--android:id="@+id/map_fragment"-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:fitsSystemWindows="true">-->
+
+                    <!--</FrameLayout>-->
+
+                    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+                        android:id="@+id/map_fragment"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        class="com.google.android.gms.maps.SupportMapFragment" />
+
+                </android.support.v7.widget.CardView>
+
+
+            </LinearLayout>
+        <!--</android.support.v4.widget.NestedScrollView>-->
+    </LinearLayout>
+</android.support.design.widget.CoordinatorLayout>
