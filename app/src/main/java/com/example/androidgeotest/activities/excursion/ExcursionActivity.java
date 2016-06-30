@@ -1,6 +1,7 @@
 package com.example.androidgeotest.activities.excursion;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -18,10 +19,13 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.SpannableStringBuilder;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.androidgeotest.R;
@@ -46,6 +50,10 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.maps.android.ui.BubbleIconFactory;
+import com.google.maps.android.ui.IconGenerator;
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.iconics.view.IconicsButton;
 
 import java.text.SimpleDateFormat;
@@ -54,6 +62,10 @@ import java.util.Calendar;
 import java.util.List;
 
 import fr.quentinklein.slt.LocationTracker;
+
+import static android.graphics.Typeface.BOLD;
+import static android.graphics.Typeface.ITALIC;
+import static android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
 
 /**
  * Created by r.sciamanna on 29/06/2016.
@@ -70,6 +82,7 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
     private Button btnReStart;
     private boolean amIrunning = false;
     private IconicsButton btnLock;
+    private TextView textView;
 
     double kmValueWhenStopped = 0.000;
     double kcalValueWhenStopped = 0.000;
@@ -87,7 +100,7 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
     SupportMapFragment mFragment;
     Marker currLocationMarker;
 
-    public static int count=1;
+    public static int count = 0;
     private PolylineOptions polylineOptions;
 
     private Bundle mbundle;
@@ -150,6 +163,7 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
         mFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_fragment);
         mFragment.getMapAsync(this);
 
+
     }
 
     /************
@@ -178,7 +192,7 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
     }
 
     private void doPickPoint() {
-        Log.wtf(TAG,"sono in pickpoint");
+        Log.wtf(TAG, "sono in pickpoint");
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -196,44 +210,35 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
             //mGoogleMap.clear();
             latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
 
-//            Bitmap.Config conf = Bitmap.Config.ARGB_8888;
-//            Bitmap bmp = Bitmap.createBitmap(200, 50, conf);
-//            Canvas canvas = new Canvas(bmp);
-//
-//            Typeface tf = Typeface.create("Helvetica", Typeface.BOLD);
-//
-//            Paint paint = new Paint();
-//            paint.setStyle(Paint.Style.FILL);
-//            paint.setColor(Color.MAGENTA);
-//            paint.setTypeface(tf);
-//            paint.setTextAlign(Paint.Align.CENTER);
-//            paint.setTextSize(20);
-//
-//
-//            canvas.drawText(String.valueOf(count), 0, 50, paint); // paint defines the text color, stroke width, size
-//            mGoogleMap.addMarker(new MarkerOptions()
-//                    .position(latLng)
-//                    //.icon(BitmapDescriptorFactory.fromResource(R.drawable.marker2))
-//                    .icon(BitmapDescriptorFactory.fromBitmap(bmp))
-//                    .anchor(0.5f, 1)
-//            );
+
+            placeMArker(this, count, latLng, mGoogleMap);
 
 
-
-            MarkerOptions markerOptions = new MarkerOptions();
-            markerOptions.position(latLng);
-            markerOptions.title("Last Position");
-            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-//            markerOptions.icon(R.drawable.common_plus_signin_btn_icon_light);
-
-            mGoogleMap.addMarker(markerOptions);
-            Marker lastMarker =  mGoogleMap.addMarker(markerOptions);
-//            mGoogleMap.setOnMarkerClickListener(this);
-//            if(onMarkerClick(currLocationMarker)){
-//                Log.wtf(TAG,"hai cliccato sul marker"+currLocationMarker.getTitle());
-//            }
             count++;
         }
+    }
+
+    private void placeMArker(Context context, int count, LatLng latLng, GoogleMap mGoogleMap) {
+
+        IconGenerator iconFactory = new IconGenerator(this);
+
+//        iconFactory.setRotation(0);
+//        iconFactory.setContentRotation(0);
+        if (count == 0) {
+             iconFactory.setStyle(IconGenerator.STYLE_BLUE);
+//            iconFactory.setBackground(new IconicsDrawable(this)
+//                    .icon(GoogleMaterial.Icon.gmd_directions_car)
+//                    .color(Color.BLUE)
+//                    .sizeDp(24));
+
+            addIcon(iconFactory, "", latLng, mGoogleMap);
+//            placeMArker(context,count,latLng,mGoogleMap);
+        } else {
+            iconFactory.setStyle(IconGenerator.STYLE_ORANGE);
+            addIcon(iconFactory, "P" + count, latLng, mGoogleMap);
+        }
+
+
     }
 
     protected synchronized void buildGoogleApiClient() {
@@ -280,6 +285,7 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
 
         buildGoogleApiClient();
 
+        mGoogleMap.getUiSettings().setZoomControlsEnabled(true);
         mGoogleApiClient.connect();
     }
 
@@ -292,6 +298,10 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
             //place marker at current position
             //mGoogleMap.clear();
             latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+            CameraPosition cameraPosition = new CameraPosition.Builder()
+                    .target(latLng).zoom(16).build();
+            mGoogleMap.animateCamera(CameraUpdateFactory
+                    .newCameraPosition(cameraPosition));
             MarkerOptions markerOptions = new MarkerOptions();
             markerOptions.position(latLng);
             markerOptions.title("Current Position");
@@ -346,12 +356,12 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
         Toast.makeText(this, "Location Changed", Toast.LENGTH_SHORT).show();
 
         //zoom to current position:
-        CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(latLng).zoom(16).build();
+//        CameraPosition cameraPosition = new CameraPosition.Builder()
+//                .target(latLng).zoom(16).build();
         FreezerLocation tmp = new FreezerLocation(location);
-        mGoogleMap.animateCamera(CameraUpdateFactory
-                .newCameraPosition(cameraPosition));
-        if(amIrunning) {
+//        mGoogleMap.animateCamera(CameraUpdateFactory
+//                .newCameraPosition(cameraPosition));
+        if (amIrunning) {
             Log.wtf("On locationChanged latLng", latLng.toString());
             locationList.add(location);
             freezerocationList.add(tmp);
@@ -378,11 +388,11 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
     }
 
 
-    public void draw(List<Location> locationList){
+    public void draw(List<Location> locationList) {
 
         polylineOptions = new PolylineOptions();
-        for(Location loc : locationList){
-            polylineOptions.add(new LatLng(loc.getLatitude(),loc.getLongitude()));
+        for (Location loc : locationList) {
+            polylineOptions.add(new LatLng(loc.getLatitude(), loc.getLongitude()));
             Log.wtf("polyline", loc.toString());
         }
         polylineOptions.width(5).color(Color.BLUE);
@@ -398,4 +408,47 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
 
 
     /************ END MAPS *************/
+
+
+    /***********
+     * MAPS EXTENSION
+     **********/
+    private void addIcon(IconGenerator iconFactory, CharSequence text, LatLng position, GoogleMap map) {
+        MarkerOptions markerOptions = new MarkerOptions().
+                icon(BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon(text))).
+                position(position).
+                anchor(iconFactory.getAnchorU(), iconFactory.getAnchorV());
+
+        map.addMarker(markerOptions);
+    }
+
+    private CharSequence makeCharSequence(String text) {
+        String prefix = "Mixing ";
+        String suffix = "different fonts";
+        String sequence = prefix + suffix;
+        SpannableStringBuilder ssb = new SpannableStringBuilder(sequence);
+        ssb.setSpan(new StyleSpan(ITALIC), 0, prefix.length(), SPAN_EXCLUSIVE_EXCLUSIVE);
+        ssb.setSpan(new StyleSpan(BOLD), prefix.length(), sequence.length(), SPAN_EXCLUSIVE_EXCLUSIVE);
+        String styledText = "This is <font color='red'>simple</font>.";
+        return ssb;
+    }
+
+    /***********END MAPS EXTENSION *******/
+
+    /*****************
+     * utils
+     *************/
+    public void drawMarker(Context context, TextView tv, GoogleMap map, int count, LatLng position) {
+        IconGenerator factory = new IconGenerator(context);
+        factory.setBackground(new IconicsDrawable(this)
+                .icon(GoogleMaterial.Icon.gmd_directions_car)
+                .color(Color.BLUE)
+                .sizeDp(24));
+        tv.setText(count);
+        tv.setTextColor(Color.CYAN);
+        factory.setContentView(tv);
+        Bitmap icon = factory.makeIcon();
+        map.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromBitmap(icon)).position(position).
+                anchor(factory.getAnchorU(), factory.getAnchorV()));
+    }
 }

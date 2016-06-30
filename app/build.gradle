@@ -57,16 +57,18 @@ dependencies {
     compile 'com.j256.ormlite:ormlite-android:4.48'
 
     /* firebase */
-//Storage
+    //Storage
     compile "com.google.firebase:firebase-database:9.2.0"
-//Analytics
+    //Analytics
     compile 'com.google.firebase:firebase-core:9.2.0'
-//Realtime Database
+    //Realtime Database
     compile 'com.google.firebase:firebase-database:9.2.0'
-//Authentication
+    //Authentication
     compile 'com.google.firebase:firebase-auth:9.2.0'
     compile 'com.google.android.gms:play-services-auth:9.2.0'
 
+    //maps utils
+    compile 'com.google.maps.android:android-maps-utils:0.4.3'
 
 }
 apply plugin: 'com.google.gms.google-services'
