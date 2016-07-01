@@ -70,7 +70,7 @@ import static android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
 /**
  * Created by r.sciamanna on 29/06/2016.
  */
-public class ExcursionActivity extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+public class ExcursionActivity extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener , GoogleMap.OnMarkerClickListener{
 
     private FreezerRace myrace;
     private Fragment mapFragment;
@@ -105,7 +105,9 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
 
     private Bundle mbundle;
     private int viewId;
-
+    private TextView altitude;
+    private TextView latText;
+    private TextView lonText;
     private View myExcursionPanel;
 
     FreezerRaceEntityManager fRaceEm = new FreezerRaceEntityManager();
@@ -160,6 +162,9 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
         btnLock = (IconicsButton) findViewById(R.id.lock_button);
         btnLock.setOnClickListener(this);
 
+        altitude = (TextView) findViewById(R.id.id_altitude);
+        latText = (TextView) findViewById(R.id.id_lat_text);
+        lonText = (TextView) findViewById(R.id.id_lon_text);
         mFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_fragment);
         mFragment.getMapAsync(this);
 
@@ -231,11 +236,11 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
 //                    .color(Color.BLUE)
 //                    .sizeDp(24));
 
-            addIcon(iconFactory, "", latLng, mGoogleMap);
+            addIcon(iconFactory, "P", latLng, mGoogleMap);
 //            placeMArker(context,count,latLng,mGoogleMap);
         } else {
             iconFactory.setStyle(IconGenerator.STYLE_ORANGE);
-            addIcon(iconFactory, "P" + count, latLng, mGoogleMap);
+            addIcon(iconFactory, "" + count, latLng, mGoogleMap);
         }
 
 
@@ -271,6 +276,7 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mGoogleMap = googleMap;
+        mGoogleMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -280,13 +286,17 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
             return;
+
         }
+
+        mGoogleMap.setOnMarkerClickListener(this);
         mGoogleMap.setMyLocationEnabled(true);
 
         buildGoogleApiClient();
 
         mGoogleMap.getUiSettings().setZoomControlsEnabled(true);
         mGoogleApiClient.connect();
+
     }
 
     @Override
@@ -353,6 +363,10 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
         currLocationMarker = mGoogleMap.addMarker(markerOptions);
 
+        /* aggiorno i dati */
+        altitude.setText(String.valueOf(location.getAltitude()));
+        latText.setText(String.valueOf(location.getLatitude()));
+        lonText.setText(String.valueOf(location.getLongitude()));
         Toast.makeText(this, "Location Changed", Toast.LENGTH_SHORT).show();
 
         //zoom to current position:
@@ -417,7 +431,8 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
         MarkerOptions markerOptions = new MarkerOptions().
                 icon(BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon(text))).
                 position(position).
-                anchor(iconFactory.getAnchorU(), iconFactory.getAnchorV());
+                anchor(iconFactory.getAnchorU(), iconFactory.getAnchorV())
+                .title(position.latitude+","+position.longitude);
 
         map.addMarker(markerOptions);
     }
@@ -429,26 +444,32 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
         SpannableStringBuilder ssb = new SpannableStringBuilder(sequence);
         ssb.setSpan(new StyleSpan(ITALIC), 0, prefix.length(), SPAN_EXCLUSIVE_EXCLUSIVE);
         ssb.setSpan(new StyleSpan(BOLD), prefix.length(), sequence.length(), SPAN_EXCLUSIVE_EXCLUSIVE);
-        String styledText = "This is <font color='red'>simple</font>.";
         return ssb;
     }
 
     /***********END MAPS EXTENSION *******/
 
-    /*****************
-     * utils
-     *************/
-    public void drawMarker(Context context, TextView tv, GoogleMap map, int count, LatLng position) {
-        IconGenerator factory = new IconGenerator(context);
-        factory.setBackground(new IconicsDrawable(this)
-                .icon(GoogleMaterial.Icon.gmd_directions_car)
-                .color(Color.BLUE)
-                .sizeDp(24));
-        tv.setText(count);
-        tv.setTextColor(Color.CYAN);
-        factory.setContentView(tv);
-        Bitmap icon = factory.makeIcon();
-        map.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromBitmap(icon)).position(position).
-                anchor(factory.getAnchorU(), factory.getAnchorV()));
+//    /*****************
+//     * utils
+//     *************/
+//    public void drawMarker(Context context, TextView tv, GoogleMap map, int count, LatLng position) {
+//        IconGenerator factory = new IconGenerator(context);
+//        factory.setBackground(new IconicsDrawable(this)
+//                .icon(GoogleMaterial.Icon.gmd_directions_car)
+//                .color(Color.BLUE)
+//                .sizeDp(24));
+//        tv.setText(count);
+//        tv.setTextColor(Color.CYAN);
+//        factory.setContentView(tv);
+//        Bitmap icon = factory.makeIcon();
+//        map.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromBitmap(icon)).position(position).
+//                anchor(factory.getAnchorU(), factory.getAnchorV()));
+//    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        /** TODO Inserire dialog con informazioni e opzione cancella punto **/
+        Log.wtf(TAG,"marker clicked"+marker.getTitle());
+        return true;
     }
 }

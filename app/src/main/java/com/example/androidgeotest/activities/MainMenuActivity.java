@@ -28,9 +28,6 @@ import com.example.androidgeotest.activities.excursion.ExcursionActivity;
 import com.example.androidgeotest.activities.running.RunningActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.mikepenz.community_material_typeface_library.CommunityMaterial;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.materialdrawer.AccountHeader;
@@ -139,9 +136,9 @@ public class MainMenuActivity extends AppCompatActivity {
 
         itemDue = new PrimaryDrawerItem()
                 .withIdentifier(2)
-                .withName("DUE")
-                .withIcon(CommunityMaterial.Icon.cmd_run)
-                .withIconColorRes(R.color.orange800)
+                .withName("Exploration")
+                .withIcon(GoogleMaterial.Icon.gmd_terrain)
+                .withIconColorRes(R.color.green900)
                 .withSelectedIconColor(ContextCompat.getColor(this, R.color.md_amber_300))
                 .withIconTintingEnabled(true)
                 .withBadgeStyle(new BadgeStyle()
@@ -179,7 +176,7 @@ public class MainMenuActivity extends AppCompatActivity {
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
                         if (drawerItem != null) {
                             if (drawerItem.getIdentifier() == 1) {
-                                openMyGpsActivity();
+                                openUno();
                             } else if (drawerItem.getIdentifier() == 2) {
                                 openDue();
                             } else if (drawerItem.getIdentifier() == 3) {
@@ -287,7 +284,7 @@ public class MainMenuActivity extends AppCompatActivity {
 //        checkGpsEnabled();
     }
 
-    private void openMyGpsActivity() {
+    private void openUno() {
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             Log.wtf("MainActivity", "Location is Enabled");
             Intent i = new Intent(this, RunningActivity.class);
@@ -300,6 +297,8 @@ public class MainMenuActivity extends AppCompatActivity {
     }
 
     private void openDue() {
+        Intent i = new Intent(this, ExcursionActivity.class);
+        startActivity(i);
 //        Intent i = new Intent(this, TestMapActivity.class);
 //        Intent i = new Intent(this, MapLocationActivity.class);
 //
