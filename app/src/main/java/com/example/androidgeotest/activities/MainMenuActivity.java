@@ -313,7 +313,7 @@ public class MainMenuActivity extends AppCompatActivity {
 
     private void openTre() {
         Intent i = new Intent(this, ExcursionActivity.class);
-        startActivity(i);
+        startActivityForResult(i,12345);
 //        openLogin();
 //         Intent i = new Intent(this, GoogleSignInActivity.class);
 //        startActivity(i);
@@ -352,10 +352,14 @@ public class MainMenuActivity extends AppCompatActivity {
                     }
                 }
                 break;
+            case 12345:
+                Log.wtf("MainMenu","result 12345");
+                break;
             default:
                 System.out.println("on activity result:\nresultCode:" + resultCode + "\nrequestCode:" + requestCode);
                 break;
         }
+
 //        if(requestCode == GPS_REQUEST_CODE && resultCode == 0){
 //            locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 //            Log.wtf("MainMenu","activity result code ="+resultCode);

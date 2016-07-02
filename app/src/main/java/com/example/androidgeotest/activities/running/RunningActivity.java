@@ -524,4 +524,16 @@ public class RunningActivity extends AppCompatActivity implements View.OnClickLi
 
     }
     /************ END MAPS *************/
+
+    @Override
+    public void onDestroy() {
+        SupportMapFragment f = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_fragment);
+        Log.wtf(TAG,"onDestry");
+        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient,this);
+        if (f.isResumed()) {
+            Log.wtf(TAG,"is resumed");
+        }
+        super.onDestroy();
+    }
+
 }

@@ -70,7 +70,7 @@ import static android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
 /**
  * Created by r.sciamanna on 29/06/2016.
  */
-public class ExcursionActivity extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener , GoogleMap.OnMarkerClickListener{
+public class ExcursionActivity extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, GoogleMap.OnMarkerClickListener {
 
     private FreezerRace myrace;
     private Fragment mapFragment;
@@ -198,16 +198,7 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
 
     private void doPickPoint() {
         Log.wtf(TAG, "sono in pickpoint");
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
+
         Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
         if (mLastLocation != null) {
@@ -230,7 +221,7 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
 //        iconFactory.setRotation(0);
 //        iconFactory.setContentRotation(0);
         if (count == 0) {
-             iconFactory.setStyle(IconGenerator.STYLE_BLUE);
+            iconFactory.setStyle(IconGenerator.STYLE_BLUE);
 //            iconFactory.setBackground(new IconicsDrawable(this)
 //                    .icon(GoogleMaterial.Icon.gmd_directions_car)
 //                    .color(Color.BLUE)
@@ -261,9 +252,12 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
+                Log.wtf(TAG, "home");
+                mGoogleMap.setMyLocationEnabled(false);
                 super.onBackPressed();
                 break;
             default:
+                Log.wtf(TAG, "default");
                 return super.onOptionsItemSelected(item);
         }
         return true;
@@ -290,7 +284,8 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
         }
 
         mGoogleMap.setOnMarkerClickListener(this);
-        mGoogleMap.setMyLocationEnabled(true);
+
+        mGoogleMap.setMyLocationEnabled(false);
 
         buildGoogleApiClient();
 
@@ -325,16 +320,6 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
         mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
         //mLocationRequest.setSmallestDisplacement(0.1F); //1/10 meter
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
     }
 
@@ -380,16 +365,7 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
             locationList.add(location);
             freezerocationList.add(tmp);
         }
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
+
         location = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
         if (amIrunning) {
@@ -432,7 +408,7 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
                 icon(BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon(text))).
                 position(position).
                 anchor(iconFactory.getAnchorU(), iconFactory.getAnchorV())
-                .title(position.latitude+","+position.longitude);
+                .title(position.latitude + "," + position.longitude);
 
         map.addMarker(markerOptions);
     }
@@ -447,7 +423,9 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
         return ssb;
     }
 
-    /***********END MAPS EXTENSION *******/
+    /***********
+     * END MAPS EXTENSION
+     *******/
 
 //    /*****************
 //     * utils
@@ -465,11 +443,23 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
 //        map.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromBitmap(icon)).position(position).
 //                anchor(factory.getAnchorU(), factory.getAnchorV()));
 //    }
-
     @Override
     public boolean onMarkerClick(Marker marker) {
         /** TODO Inserire dialog con informazioni e opzione cancella punto **/
-        Log.wtf(TAG,"marker clicked"+marker.getTitle());
+        Log.wtf(TAG, "marker clicked" + marker.getTitle());
         return true;
     }
+
+    @Override
+    public void onDestroy() {
+        SupportMapFragment f = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_fragment);
+        Log.wtf(TAG,"onDestry");
+        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient,this);
+        if (f.isResumed()) {
+            Log.wtf(TAG,"is resumed");
+        }
+        super.onDestroy();
+    }
+
+
 }

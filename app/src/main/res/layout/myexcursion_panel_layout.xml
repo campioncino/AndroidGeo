@@ -49,6 +49,7 @@
                         android:layout_weight="1"
                         android:orientation="vertical">
 
+
                         <TextView
                             android:id="@+id/id_altitude"
                             android:layout_width="wrap_content"
@@ -74,23 +75,48 @@
                         android:layout_weight="1"
                         android:orientation="vertical">
 
-                        <TextView
-                            android:id="@+id/id_lat_text"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:text="value"
-                            android:textColor="@color/myPrimary_text_light"
-                            android:textSize="30sp" />
-
-                        <TextView
-                            android:id="@+id/id_lon_text"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:text="value"
-                            android:textColor="@color/myPrimary_text_light"
-                            android:textSize="30sp" />
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:text="Lat"
+                                android:layout_marginRight="5dp"
+                                android:textColor="@color/myPrimary_text_light"
+                                android:textSize="20sp" />
+                            <TextView
+                                android:id="@+id/id_lat_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:text="value"
+                                android:textColor="@color/myPrimary_text_light"
+                                android:textSize="20sp" />
+                        </LinearLayout>
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:text="Lon"
+                                android:layout_marginRight="5dp"
+                                android:textColor="@color/myPrimary_text_light"
+                                android:textSize="20sp" />
+                            <TextView
+                                android:id="@+id/id_lon_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:text="value"
+                                android:textColor="@color/myPrimary_text_light"
+                                android:textSize="20sp" />
+                        </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
