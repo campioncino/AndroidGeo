@@ -30,6 +30,7 @@ import android.widget.Toast;
 
 import com.example.androidgeotest.R;
 import com.example.androidgeotest.activities.Code;
+import com.example.androidgeotest.activities.Util.MapUtils;
 import com.example.androidgeotest.activities.business.model.FreezerLocation;
 import com.example.androidgeotest.activities.business.model.FreezerRace;
 import com.example.androidgeotest.activities.business.model.FreezerRaceEntityManager;
@@ -80,6 +81,7 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
     private Button btnStop;
     private Button btnPause;
     private Button btnReStart;
+    private Button btnBearing;
     private boolean amIrunning = false;
     private IconicsButton btnLock;
     private TextView textView;
@@ -100,7 +102,7 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
     SupportMapFragment mFragment;
     Marker currLocationMarker;
 
-    public static int count = 0;
+    public static int count;
     private PolylineOptions polylineOptions;
 
     private Bundle mbundle;
@@ -117,7 +119,7 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        count = 0;
         /* mi setto sul mio firebase db */
         rootRef = FirebaseDatabase.getInstance()
                 .getReferenceFromUrl(Code.FIREBASE_DB);
@@ -146,6 +148,9 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
 
         btnStart = (Button) findViewById(R.id.big_start_button);
         btnStart.setOnClickListener(this);
+
+        btnBearing =(Button) findViewById(R.id.bearing_button);
+        btnBearing.setOnClickListener(this);
 
         btnStop = (Button) findViewById(R.id.stop_button);
         btnStop.setOnClickListener(this);
@@ -181,7 +186,8 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
             case R.id.big_start_button:
                 doPickPoint();
                 break;
-            case R.id.lock_button:
+            case R.id.bearing_button:
+                mGoogleMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(latLng, 16, 0, MapUtils.calculateBearing(locationList.get(0),locationList.get(1)))));
                 Log.wtf(TAG, "" + view.getId());
                 break;
             case R.id.pause_button:
@@ -205,7 +211,7 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
             //place marker at current position
             //mGoogleMap.clear();
             latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-
+            locationList.add(mLastLocation);
 
             placeMArker(this, count, latLng, mGoogleMap);
 
@@ -253,7 +259,7 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
             case android.R.id.home:
                 finish();
                 Log.wtf(TAG, "home");
-                mGoogleMap.setMyLocationEnabled(false);
+                mGoogleMap.setMyLocationEnabled(true);
                 super.onBackPressed();
                 break;
             default:
@@ -285,7 +291,7 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
 
         mGoogleMap.setOnMarkerClickListener(this);
 
-        mGoogleMap.setMyLocationEnabled(false);
+        mGoogleMap.setMyLocationEnabled(true);
 
         buildGoogleApiClient();
 
@@ -460,6 +466,8 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
         }
         super.onDestroy();
     }
+
+
 
 
 }
