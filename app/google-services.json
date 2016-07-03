@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "149854631625-ebn5cfd7c8uue27ejrjnumhu1rstc35p.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.androidgeotest",
+            "certificate_hash": "EC60F18F8F0085F2F5BEA29FB32A4076A31F7E18"
+          }
+        },
+        {
           "client_id": "149854631625-59ee0jc7b3jqncnm23uen9ok0ct45jst.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
