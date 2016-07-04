@@ -21,7 +21,7 @@ import com.example.androidgeotest.R;
  * Created by izs on 05/04/16.
  */
 public class DummyFragment extends Fragment {
-
+    //todo canbuare questo fragment con uno più opportuno
     private CoordinatorLayout coordinatorLayout;
     private Button downloadButton;
     private ProgressDialog progressDialog;
@@ -29,6 +29,7 @@ public class DummyFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        //preova
 //        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Download Dati Utente");
     }
 
@@ -45,7 +46,7 @@ public class DummyFragment extends Fragment {
         downloadButton = (Button) v.findViewById(R.id.download_button);
         downloadButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Log.d("DummyFragment","SCHIACCIATO");
+                Log.d("DummyFragment", "SCHIACCIATO");
             }
         });
         return v;

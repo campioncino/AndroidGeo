@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
     <LinearLayout
@@ -101,8 +102,6 @@
                         android:layout_weight="1"
                         android:orientation="vertical">
 
-
-
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -135,6 +134,17 @@
             android:paddingBottom="10dp"
             android:paddingTop="10dp">
 
+            <com.mikepenz.iconics.view.IconicsImageView
+                android:id="@+id/navigation_icon"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                app:iiv_color="@color/accent"
+                app:iiv_icon="gmd-navigation" />
+            <TextView
+                android:id="@+id/navigation_val"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="22sp"/>
 
             <Button
                 android:id="@+id/big_start_button"

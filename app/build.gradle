@@ -70,6 +70,8 @@ dependencies {
     //maps utils
     compile 'com.google.maps.android:android-maps-utils:0.4.3'
 
+    //sensor utils
+    compile project(':dsensor');
 }
 apply plugin: 'com.google.gms.google-services'
 
