@@ -2,6 +2,7 @@ package com.example.androidgeotest.activities.excursion;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -17,20 +18,25 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableStringBuilder;
 import android.text.style.StyleSpan;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,6 +44,8 @@ import android.widget.Toast;
 import com.example.androidgeotest.R;
 import com.example.androidgeotest.activities.Code;
 import com.example.androidgeotest.activities.Util.MapUtils;
+import com.example.androidgeotest.activities.Util.MyApplication;
+import com.example.androidgeotest.activities.Util.MyDialog;
 import com.example.androidgeotest.activities.business.model.FreezerLocation;
 import com.example.androidgeotest.activities.business.model.FreezerRace;
 import com.example.androidgeotest.activities.business.model.FreezerRaceEntityManager;
@@ -71,6 +79,7 @@ import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.iconics.view.IconicsButton;
 
+import java.sql.SQLOutput;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -108,13 +117,12 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
     private CameraPosition cameraPosition;
     private static List<Location> locationList = new ArrayList<Location>();
     private static List<FreezerLocation> freezerocationList = new ArrayList<FreezerLocation>();
-    LocationRequest mLocationRequest;
-    GoogleApiClient mGoogleApiClient;
-
-    LatLng latLng;
-    GoogleMap mGoogleMap;
-    SupportMapFragment mFragment;
-    Marker currLocationMarker;
+    private LocationRequest mLocationRequest;
+    private GoogleApiClient mGoogleApiClient;
+    private LatLng latLng;
+    private GoogleMap mGoogleMap;
+    private SupportMapFragment mFragment;
+    private Marker currLocationMarker;
 
     public static int count;
     private PolylineOptions polylineOptions;
@@ -127,6 +135,10 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
     private View myExcursionPanel;
 
     private ImageView nav;
+    private TextView navValue;
+    private TextView bearingValue;
+    private TextView manualBearing;
+    private TextView rotationAngle;
 
     /***sensor value */
     public static final String DPROCESSEDSENSOR_TYPE = "DProcessedSensorType";
@@ -198,6 +210,12 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
         mFragment.getMapAsync(this);
         initSensor();
         nav =(ImageView) findViewById(R.id.navigation_icon);
+
+        navValue = (TextView) findViewById(R.id.navigation_val);
+        bearingValue = (TextView) findViewById(R.id.navigation_bearing);
+        manualBearing = (TextView) findViewById(R.id.manual_bearing);
+
+        rotationAngle = (TextView) findViewById(R.id.rotation_value);
     }
 
     /************
@@ -302,6 +320,7 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
     public void onMapReady(GoogleMap googleMap) {
         mGoogleMap = googleMap;
         mGoogleMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -337,8 +356,10 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
             //place marker at current position
             //mGoogleMap.clear();
             latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+//            CameraPosition cameraPosition = new CameraPosition.Builder()
+//                    .target(latLng).zoom(16).build();
             CameraPosition cameraPosition = new CameraPosition.Builder()
-                    .target(latLng).zoom(16).build();
+                    .target(latLng).build();
             mGoogleMap.animateCamera(CameraUpdateFactory
                     .newCameraPosition(cameraPosition));
             MarkerOptions markerOptions = new MarkerOptions();
@@ -346,11 +367,13 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
             markerOptions.title("Current Position");
             markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
             currLocationMarker = mGoogleMap.addMarker(markerOptions);
+            mGoogleMap.getUiSettings().setCompassEnabled(true);
+            mGoogleMap.getUiSettings().setMyLocationButtonEnabled(true);
         }
 
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(30000); //30 seconds
-        mLocationRequest.setFastestInterval(10000); //10 seconds
+        mLocationRequest.setInterval(3000); //3 seconds
+        mLocationRequest.setFastestInterval(5000); //5 seconds
         mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
         //mLocationRequest.setSmallestDisplacement(0.1F); //1/10 meter
 
@@ -381,7 +404,11 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
         markerOptions.title("Current Position");
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
         currLocationMarker = mGoogleMap.addMarker(markerOptions);
+        currLocationMarker.setDraggable(true);
+        mGoogleMap.getUiSettings().setCompassEnabled(true);
+        mGoogleMap.getUiSettings().setMyLocationButtonEnabled(true);
 
+//
         /* aggiorno i dati */
         altitude.setText(String.valueOf(location.getAltitude()));
         latText.setText(String.valueOf(location.getLatitude()));
@@ -395,12 +422,14 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
 //             cameraPosition = new CameraPosition.Builder()
 //                    .target(latLng).zoom(16).build();
 //        }
-        cameraPosition = new CameraPosition.Builder()
-                .target(latLng).zoom(16).build();
+//        cameraPosition = new CameraPosition.Builder()
+//                .target(latLng).zoom(20).build();
+//        cameraPosition = new CameraPosition.Builder()
+//                .target(latLng).build();
         //zoom to current position:
         FreezerLocation tmp = new FreezerLocation(location);
-        mGoogleMap.animateCamera(CameraUpdateFactory
-                .newCameraPosition(cameraPosition));
+//        mGoogleMap.animateCamera(CameraUpdateFactory
+//                .newCameraPosition(cameraPosition));
         if(amIrunning) {
             Log.wtf("On locationChanged latLng", latLng.toString());
             locationList.add(location);
@@ -431,21 +460,14 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
 
     }
 
-    public void onInfoWindowClick(final Marker marker) {
-
-
-        final String title = marker.getTitle();
-        Log.wtf(TAG,"marker pressed");
-        marker.hideInfoWindow();
-
-
-    }
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-       Log.wtf(TAG, "marker clicked" + marker.getTitle());
+       Log.wtf(TAG, "marker clicked  " + marker.getTitle());
+        showdialog(marker);
         return true;
     }
+
 
 
     /************ END MAPS *************/
@@ -461,8 +483,9 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
                 anchor(iconFactory.getAnchorU(), iconFactory.getAnchorV())
                 .title(position.latitude + "," + position.longitude);
 
-        map.addMarker(markerOptions);
+        map.addMarker(markerOptions).setDraggable(true);
     }
+
 
     private CharSequence makeCharSequence(String text) {
         String prefix = "Mixing ";
@@ -478,28 +501,6 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
      * END MAPS EXTENSION
      *******/
 
-//    /*****************
-//     * utils
-//     *************/
-//    public void drawMarker(Context context, TextView tv, GoogleMap map, int count, LatLng position) {
-//        IconGenerator factory = new IconGenerator(context);
-//        factory.setBackground(new IconicsDrawable(this)
-//                .icon(GoogleMaterial.Icon.gmd_directions_car)
-//                .color(Color.BLUE)
-//                .sizeDp(24));
-//        tv.setText(count);
-//        tv.setTextColor(Color.CYAN);
-//        factory.setContentView(tv);
-//        Bitmap icon = factory.makeIcon();
-//        map.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromBitmap(icon)).position(position).
-//                anchor(factory.getAnchorU(), factory.getAnchorV()));
-//    }
-//    @Override
-//    public boolean onMarkerClick(Marker marker) {
-//        /** TODO Inserire dialog con informazioni e opzione cancella punto **/
-//        Log.wtf(TAG, "marker clicked" + marker.getTitle());
-//        return true;
-//    }
 
     @Override
     public void onDestroy() {
@@ -526,7 +527,6 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
     }
 
     public void onProcessedValueChanged(DSensorEvent dSensorEvent) {
-        float p=0;
         if (dSensorEvent.sensorType == DSensor.TYPE_DEVICE_MAGNETIC_FIELD) {
             mDepreciatedOrientationValueTextView.setText(String.valueOf(Math.round(dSensorEvent.values[0])));
         } else {
@@ -534,9 +534,9 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
                 mCompassValueTextView.setText("Device is not flat no compass value");
             } else {
                 int valueInDegree = (int) Math.round(Math.toDegrees(dSensorEvent.values[0]));
-                if (valueInDegree < 0) {
-                    valueInDegree = (valueInDegree + 360) % 360;
-                }
+//                if (valueInDegree < 0) {
+//                    valueInDegree = (valueInDegree + 360) % 360;
+//                }
                 //mCompassValueTextView.setText(String.valueOf(valueInDegree));
                 angle= valueInDegree;
 //                cameraPosition = new CameraPosition.Builder()
@@ -544,6 +544,7 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
 //                mGoogleMap.animateCamera(CameraUpdateFactory
 //                        .newCameraPosition(cameraPosition));
                 Log.wtf(TAG, "OnProcessValueChange");
+                navValue.setText("compass "+angle);
                 rotateImg();
             }
         }
@@ -551,11 +552,22 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
 
     public void rotateImg(){
         float toBase=0;
+        double manual = 0;
         if(mylocation!=null && locationList.size()>0){
             toBase=mylocation.bearingTo(locationList.get(0));
-            Log.wtf("bearing",String.valueOf(mylocation.bearingTo(locationList.get(0))));
+            if(toBase<0) {
+                toBase=360-Math.abs(toBase);
+            }
+            manual = calculateBearing(mylocation,locationList.get(0));
+           // Log.wtf("bearing",String.valueOf(mylocation.bearingTo(locationList.get(0))));
         }
-        nav.setRotation(angle+toBase);
+
+        bearingValue.setText("bearing "+toBase);
+        manualBearing.setText("manual "+manual);
+      //  nav.setRotation(toBase-angle);
+        float res = (float) (manual-angle);
+        nav.setRotation((float) (manual-angle));
+        rotationAngle.setText(""+res);
     }
 
     @Override
@@ -570,4 +582,97 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
           //  mCompassValueTextView.setText("error_no_accelerometer_sensor");
         }
     }
+
+    public void showMyDialog(Marker marker){
+        final Marker myMark = marker;
+        LayoutInflater inflater= getLayoutInflater();
+        View view = inflater.inflate(R.layout.dialog,null);
+        final CoordinatorLayout coordinatorLayout = (CoordinatorLayout) view.findViewById(R.id.coordinatorlayout);
+        MyDialog.Builder builder = new MyDialog.Builder(this);
+        builder.show();
+    }
+
+
+    public void showdialog(final Marker marker) {
+        LayoutInflater inflater = getLayoutInflater();
+        View view = inflater.inflate(R.layout.dialog, null);
+        final EditText text1 = (EditText) view.findViewById(R.id.text1);
+        final TextView lat = (TextView) view.findViewById(R.id.latTex);
+        final TextView lon = (TextView) view.findViewById(R.id.lonTex);
+
+        lat.setText("Lat "+ marker.getPosition().latitude);
+        lon.setText("Lon "+ marker.getPosition().longitude);
+        if(!marker.getTitle().toString().isEmpty()){
+            text1.setText(marker.getTitle().toString());
+        }
+
+        final CoordinatorLayout coordinatorLayout = (CoordinatorLayout) view.findViewById(R.id.coordinatorlayout);
+        final Marker mymarker = marker;
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(view);
+        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+
+            }
+        });
+        builder.setNegativeButton("Elimina", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+                count--;
+                if(count<0){
+                    count=0;
+                }
+                marker.remove();
+                marker.setVisible(false);
+            }
+        });
+
+        builder.setNeutralButton("Annulla", new DialogInterface.OnClickListener(){
+            public void onClick(DialogInterface dialog, int id){
+                dialog.dismiss();
+            }
+        });
+        builder.setTitle("DIALOG");
+        final AlertDialog dialog = builder.create();
+        dialog.show();
+
+
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+
+            public void onClick(View v) {
+                String nomePdi = text1.getText().toString();
+                if (nomePdi.isEmpty()) {
+                    MyApplication.showErrorSnackbar(coordinatorLayout, "porc");
+                } else {
+                    marker.setTitle(nomePdi);
+                    dialog.dismiss();
+//                    count--;
+
+
+                }
+            }
+        });
+
+    }
+
+    public double calculateBearing(Location current, Location target){
+        double dLat = Math.toRadians(target.getLatitude() - current.getLatitude());
+        double dLon = Math.toRadians(target.getLongitude()-current.getLongitude());
+
+         double lat1 = Math.toRadians(current.getLatitude());
+        double lat2 = Math.toRadians(target.getLatitude());
+
+        double y = Math.sin(dLon) * Math.cos(lat2);
+        double x = Math.cos(lat1)*Math.sin(lat2) -
+                Math.sin(lat1)*Math.cos(lat2)*Math.cos(dLon);
+        double brng = Math.toDegrees(Math.atan2(y, x));
+
+        // fix negative degrees
+        if(brng<0) {
+            brng=360-Math.abs(brng);
+        }
+
+        return brng ;
+    }
+
 }
