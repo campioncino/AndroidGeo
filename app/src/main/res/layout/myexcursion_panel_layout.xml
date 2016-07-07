@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
     <LinearLayout
@@ -24,20 +24,6 @@
                 android:layout_gravity="center"
                 android:orientation="vertical">
 
-                <!--<Chronometer-->
-                    <!--android:id="@+id/mychronometer"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_gravity="center"-->
-                    <!--android:textSize="40sp"/>-->
-
-                <!--<TextView-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_gravity="center"-->
-                    <!--android:text="durata"-->
-                    <!--android:textColor="@color/mySecondary_text"-->
-                    <!--android:textSize="12sp" />-->
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -58,6 +44,7 @@
                             android:text="Latitudine"
                             android:textColor="@color/mySecondary_text"
                             android:textSize="15sp" />
+
                         <TextView
                             android:id="@+id/id_lat_text"
                             android:layout_width="wrap_content"
@@ -84,6 +71,7 @@
                             android:text="Longitudine"
                             android:textColor="@color/mySecondary_text"
                             android:textSize="15sp" />
+
                         <TextView
                             android:id="@+id/id_lon_text"
                             android:layout_width="wrap_content"
@@ -91,7 +79,7 @@
                             android:layout_gravity="center"
                             android:text="value"
                             android:textColor="@color/myPrimary_text_light"
-                            android:textSize="22sp"/>
+                            android:textSize="22sp" />
 
 
                     </LinearLayout>
@@ -102,21 +90,22 @@
                         android:layout_weight="1"
                         android:orientation="vertical">
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:text="Altitudine"
-                                android:textColor="@color/mySecondary_text"
-                                android:textSize="15sp" />
-                            <TextView
-                                android:id="@+id/id_altitude"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:text="value"
-                                android:textColor="@color/myPrimary_text_light"
-                                android:textSize="22sp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="Altitudine"
+                            android:textColor="@color/mySecondary_text"
+                            android:textSize="15sp" />
+
+                        <TextView
+                            android:id="@+id/id_altitude"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="value"
+                            android:textColor="@color/myPrimary_text_light"
+                            android:textSize="22sp" />
 
 
                     </LinearLayout>
@@ -126,97 +115,5 @@
 
         </android.support.v7.widget.CardView>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:paddingBottom="10dp"
-            android:paddingTop="10dp">
-
-            <com.mikepenz.iconics.view.IconicsImageView
-                android:id="@+id/navigation_icon"
-                android:layout_width="72dp"
-                android:layout_height="72dp"
-                app:iiv_color="@color/accent"
-                app:iiv_icon="gmd-navigation" />
-            <TextView
-                android:id="@+id/navigation_val"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="22sp"/>
-            <TextView
-                android:id="@+id/navigation_bearing"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="22sp"/>
-            <TextView
-                android:id="@+id/manual_bearing"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="22sp"/>
-            <TextView
-                android:id="@+id/rotation_value"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="22sp"/>
-
-            <Button
-                android:id="@+id/big_start_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/greenA700"
-                android:text="START"
-                android:textColor="@color/White" />
-            <Button
-                android:id="@+id/bearing_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/pink500"
-                android:text="Bearing"
-                android:textColor="@color/White" />
-
-            <Button
-                android:id="@+id/restart_button"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:background="@color/greenA700"
-                android:text="RIPRENDI"
-                android:textColor="@color/White"
-                android:visibility="gone" />
-
-            <Button
-                android:id="@+id/pause_button"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:background="@color/blueGray400"
-                android:text="PAUSA"
-                android:textColor="@color/White"
-                android:visibility="gone" />
-
-            <com.mikepenz.iconics.view.IconicsButton
-                android:id="@+id/lock_button"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@drawable/circle"
-                android:text="{gmd-lock}"
-                android:textColor="@color/accent"
-                android:textSize="80dp"
-                android:visibility="gone" />
-
-            <Button
-                android:id="@+id/stop_button"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:background="@color/blueGray400"
-                android:text="STOP"
-                android:textColor="@color/White"
-                android:visibility="gone" />
-
-        </LinearLayout>
     </LinearLayout>
 </LinearLayout>

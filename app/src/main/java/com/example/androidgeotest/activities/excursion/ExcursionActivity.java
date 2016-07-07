@@ -94,7 +94,7 @@ import static android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
 /**
  * Created by r.sciamanna on 29/06/2016.
  */
-public class ExcursionActivity extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, GoogleMap.OnMarkerClickListener,DProcessedEventListener {
+public class ExcursionActivity extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, GoogleMap.OnMarkerClickListener{
 
     private FreezerRace myrace;
     private Fragment mapFragment;
@@ -185,9 +185,6 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
         btnStart = (Button) findViewById(R.id.big_start_button);
         btnStart.setOnClickListener(this);
 
-        btnBearing =(Button) findViewById(R.id.bearing_button);
-        btnBearing.setOnClickListener(this);
-
         btnStop = (Button) findViewById(R.id.stop_button);
         btnStop.setOnClickListener(this);
         btnStop.setEnabled(false);
@@ -208,14 +205,6 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
         lonText = (TextView) findViewById(R.id.id_lon_text);
         mFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_fragment);
         mFragment.getMapAsync(this);
-        initSensor();
-        nav =(ImageView) findViewById(R.id.navigation_icon);
-
-        navValue = (TextView) findViewById(R.id.navigation_val);
-        bearingValue = (TextView) findViewById(R.id.navigation_bearing);
-        manualBearing = (TextView) findViewById(R.id.manual_bearing);
-
-        rotationAngle = (TextView) findViewById(R.id.rotation_value);
     }
 
     /************
@@ -227,10 +216,6 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
         switch (view.getId()) {
             case R.id.big_start_button:
                 doPickPoint();
-                break;
-            case R.id.bearing_button:
-                draw(locationList);
-                Log.wtf(TAG, "" + view.getId());
                 break;
             case R.id.pause_button:
                 Log.wtf(TAG, "" + view.getId());
@@ -321,18 +306,6 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
         mGoogleMap = googleMap;
         mGoogleMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-
-        }
-
         mGoogleMap.setOnMarkerClickListener(this);
 
         mGoogleMap.setMyLocationEnabled(true);
@@ -369,6 +342,7 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
             currLocationMarker = mGoogleMap.addMarker(markerOptions);
             mGoogleMap.getUiSettings().setCompassEnabled(true);
             mGoogleMap.getUiSettings().setMyLocationButtonEnabled(true);
+
         }
 
         mLocationRequest = new LocationRequest();
@@ -414,18 +388,11 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
         latText.setText(String.valueOf(location.getLatitude()));
         lonText.setText(String.valueOf(location.getLongitude()));
         Toast.makeText(this, "Location Changed", Toast.LENGTH_SHORT).show();
-//        if(location!=null && locationList.size()>0){
-//             cameraPosition = new CameraPosition.Builder()
-//                    .target(latLng).zoom(16).bearing(location.bearingTo(locationList.get(0))).build();
-//        }
-//        else{
-//             cameraPosition = new CameraPosition.Builder()
-//                    .target(latLng).zoom(16).build();
-//        }
-//        cameraPosition = new CameraPosition.Builder()
-//                .target(latLng).zoom(20).build();
-//        cameraPosition = new CameraPosition.Builder()
-//                .target(latLng).build();
+
+        cameraPosition = new CameraPosition.Builder()
+                .target(latLng).zoom(18).build();
+        cameraPosition = new CameraPosition.Builder()
+                .target(latLng).build();
         //zoom to current position:
         FreezerLocation tmp = new FreezerLocation(location);
 //        mGoogleMap.animateCamera(CameraUpdateFactory
@@ -513,74 +480,10 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
         super.onDestroy();
     }
 
-    public void initSensor(){
-        Intent intent = getIntent();
-        mDProcessedSensorType = intent == null ? DProcessedSensor.TYPE_3D_COMPASS
-                : intent.getIntExtra(DPROCESSEDSENSOR_TYPE, DProcessedSensor.TYPE_3D_COMPASS);
-        if (mDProcessedSensorType == DProcessedSensor.TYPE_COMPASS_FLAT_ONLY_AND_DEPRECIATED_ORIENTATION
-                || mDProcessedSensorType == DProcessedSensor.TYPE_3D_COMPASS_AND_DEPRECIATED_ORIENTATION) {
-            mDepreciatedOrientationValueTextView = (TextView) findViewById(R.id.textview_orientation_value);
-            TextView depreciatedOrientationTextView = (TextView) findViewById(R.id.textview_orientation);
-            mDepreciatedOrientationValueTextView.setVisibility(View.VISIBLE);
-            depreciatedOrientationTextView.setVisibility(View.VISIBLE);
-        }
-    }
-
-    public void onProcessedValueChanged(DSensorEvent dSensorEvent) {
-        if (dSensorEvent.sensorType == DSensor.TYPE_DEVICE_MAGNETIC_FIELD) {
-            mDepreciatedOrientationValueTextView.setText(String.valueOf(Math.round(dSensorEvent.values[0])));
-        } else {
-            if (Float.isNaN(dSensorEvent.values[0])) {
-                mCompassValueTextView.setText("Device is not flat no compass value");
-            } else {
-                int valueInDegree = (int) Math.round(Math.toDegrees(dSensorEvent.values[0]));
-//                if (valueInDegree < 0) {
-//                    valueInDegree = (valueInDegree + 360) % 360;
-//                }
-                //mCompassValueTextView.setText(String.valueOf(valueInDegree));
-                angle= valueInDegree;
-//                cameraPosition = new CameraPosition.Builder()
-//                        .target(latLng).zoom(16).bearing(angle).build();
-//                mGoogleMap.animateCamera(CameraUpdateFactory
-//                        .newCameraPosition(cameraPosition));
-                Log.wtf(TAG, "OnProcessValueChange");
-                navValue.setText("compass "+angle);
-                rotateImg();
-            }
-        }
-    }
-
-    public void rotateImg(){
-        float toBase=0;
-        double manual = 0;
-        if(mylocation!=null && locationList.size()>0){
-            toBase=mylocation.bearingTo(locationList.get(0));
-            if(toBase<0) {
-                toBase=360-Math.abs(toBase);
-            }
-            manual = calculateBearing(mylocation,locationList.get(0));
-           // Log.wtf("bearing",String.valueOf(mylocation.bearingTo(locationList.get(0))));
-        }
-
-        bearingValue.setText("bearing "+toBase);
-        manualBearing.setText("manual "+manual);
-      //  nav.setRotation(toBase-angle);
-        float res = (float) (manual-angle);
-        nav.setRotation((float) (manual-angle));
-        rotationAngle.setText(""+res);
-    }
 
     @Override
     protected void onResume() {
         super.onResume();
-
-        int flag = DSensorManager.startDProcessedSensor(this, mDProcessedSensorType, this);
-        if ((flag & DSensorManager.TYPE_MAGNETIC_FIELD_NOT_AVAILABLE) != 0) {
-           // mCompassValueTextView.setText("error_no_magnetic_field_sensor");
-        } else if ((flag & DSensorManager.TYPE_GRAVITY_NOT_AVAILABLE) != 0
-                && (flag & DSensorManager.TYPE_ACCELEROMETER_NOT_AVAILABLE) != 0) {
-          //  mCompassValueTextView.setText("error_no_accelerometer_sensor");
-        }
     }
 
     public void showMyDialog(Marker marker){
@@ -653,26 +556,6 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
             }
         });
 
-    }
-
-    public double calculateBearing(Location current, Location target){
-        double dLat = Math.toRadians(target.getLatitude() - current.getLatitude());
-        double dLon = Math.toRadians(target.getLongitude()-current.getLongitude());
-
-         double lat1 = Math.toRadians(current.getLatitude());
-        double lat2 = Math.toRadians(target.getLatitude());
-
-        double y = Math.sin(dLon) * Math.cos(lat2);
-        double x = Math.cos(lat1)*Math.sin(lat2) -
-                Math.sin(lat1)*Math.cos(lat2)*Math.cos(dLon);
-        double brng = Math.toDegrees(Math.atan2(y, x));
-
-        // fix negative degrees
-        if(brng<0) {
-            brng=360-Math.abs(brng);
-        }
-
-        return brng ;
     }
 
 }
