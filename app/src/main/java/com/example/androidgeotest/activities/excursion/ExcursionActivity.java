@@ -29,6 +29,7 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -38,6 +39,7 @@ import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -75,7 +77,9 @@ import com.google.maps.android.ui.BubbleIconFactory;
 import com.google.maps.android.ui.IconGenerator;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
+import com.mikepenz.iconics.typeface.IIcon;
 import com.mikepenz.iconics.view.IconicsButton;
+import com.mikepenz.material_design_iconic_typeface_library.MaterialDesignIconic;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.holder.BadgeStyle;
@@ -89,6 +93,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.zip.Inflater;
 
 import fr.quentinklein.slt.LocationTracker;
 
@@ -100,7 +105,7 @@ import static android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
  * Created by r.sciamanna on 29/06/2016.
  */
 public class ExcursionActivity extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, GoogleMap.OnMarkerClickListener {
-
+    private static final int MENU_ADD = 100;
     private FreezerRace myrace;
     private Fragment mapFragment;
     final static String TAG = ExcursionActivity.class.getSimpleName();
@@ -311,7 +316,15 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
+        MenuItem addPlace;
+        addPlace = menu.add(0, MENU_ADD, 0, "Save").setIcon(R.drawable.map_marker_plus);
+        MenuItemCompat.setShowAsAction(addPlace,
+                MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+
+        addPlace.setVisible(true);
+
         getMenuInflater().inflate(R.menu.menu_excursion, menu);
+
         return true;
     }
 
@@ -394,8 +407,12 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
             case android.R.id.home:
                Log.wtf("HOME","home button pressed");
                 return true;
-            case R.id.miCompose:
-                Log.wtf("HOME","home button pressed");
+            case R.id.miAddPlace:
+                Log.wtf("ADD PLACE","place button pressed");
+                doPickPoint();
+                break;
+            case MENU_ADD:
+                doPickPoint();
                 break;
         }
         return super.onOptionsItemSelected(item);
