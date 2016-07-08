@@ -24,7 +24,6 @@ import android.widget.Toast;
 
 import com.example.androidgeotest.R;
 import com.example.androidgeotest.activities.auth.GoogleSignInFragment;
-import com.example.androidgeotest.activities.excursion.CompassActivity;
 import com.example.androidgeotest.activities.excursion.ExcursionActivity;
 import com.example.androidgeotest.activities.running.RunningActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -315,8 +314,8 @@ public class MainMenuActivity extends AppCompatActivity {
     }
 
     private void openTre() {
-        Intent i = new Intent(this, CompassActivity.class);
-        startActivityForResult(i,12345);
+//        Intent i = new Intent(this, CompassActivity.class);
+//        startActivityForResult(i,12345);
 //        openLogin();
 //         Intent i = new Intent(this, GoogleSignInActivity.class);
 //        startActivity(i);

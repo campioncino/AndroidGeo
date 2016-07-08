@@ -24,8 +24,12 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -33,6 +37,7 @@ import android.text.SpannableStringBuilder;
 import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -68,16 +73,16 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.maps.android.ui.BubbleIconFactory;
 import com.google.maps.android.ui.IconGenerator;
-import com.hoan.dsensor_master.DProcessedSensor;
-import com.hoan.dsensor_master.DProcessedSensorEvent;
-import com.hoan.dsensor_master.DSensor;
-import com.hoan.dsensor_master.DSensorEvent;
-import com.hoan.dsensor_master.DSensorManager;
-import com.hoan.dsensor_master.interfaces.DProcessedEventListener;
-import com.hoan.dsensor_master.interfaces.DSensorEventListener;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.iconics.view.IconicsButton;
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.holder.BadgeStyle;
+import com.mikepenz.materialdrawer.model.DividerDrawerItem;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import java.sql.SQLOutput;
 import java.text.SimpleDateFormat;
@@ -94,7 +99,7 @@ import static android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
 /**
  * Created by r.sciamanna on 29/06/2016.
  */
-public class ExcursionActivity extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, GoogleMap.OnMarkerClickListener{
+public class ExcursionActivity extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, GoogleMap.OnMarkerClickListener {
 
     private FreezerRace myrace;
     private Fragment mapFragment;
@@ -134,13 +139,19 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
     private TextView lonText;
     private View myExcursionPanel;
 
-    private ImageView nav;
-    private TextView navValue;
-    private TextView bearingValue;
-    private TextView manualBearing;
-    private TextView rotationAngle;
+    private FloatingActionButton fab;
 
-    /***sensor value */
+    private CoordinatorLayout coordinatorLayout;
+
+    private NavigationView navigationView;
+    public Drawer drawer = null;
+
+    public PrimaryDrawerItem itemUno = null;
+    public PrimaryDrawerItem itemDue = null;
+    public PrimaryDrawerItem itemTre = null;
+    /***
+     * sensor value
+     */
     public static final String DPROCESSEDSENSOR_TYPE = "DProcessedSensorType";
     private int angle;
 
@@ -160,51 +171,148 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
         rootRef = FirebaseDatabase.getInstance()
                 .getReferenceFromUrl(Code.FIREBASE_DB);
 
-        setContentView(R.layout.excursion_layout_activity);
+//        setContentView(R.layout.excursion_layout_activity);
 //        AndroidBug5497Workaround.assistActivity(this);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
-        setSupportActionBar((Toolbar) findViewById(R.id.main_toolbar));
-        this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
+//
+//        setSupportActionBar((Toolbar) findViewById(R.id.main_toolbar));
+//        this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setContentView(R.layout.excursion_layout_activity_2);
+        initToolbar();
 
+        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.content);
         myExcursionPanel = findViewById(R.id.myExcursionPanelLayout);
 
+        navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        View headerView = navigationView.getHeaderView(0);
+        initDrawer(savedInstanceState);
 //        mapFragment = new MapFragment();
 //        getSupportFragmentManager().beginTransaction()
 //                .replace(R.id.map_fragment, mapFragment).commit();
-        CollapsingToolbarLayout collapsingToolbar =
-                (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        collapsingToolbar.setTitle("Escursione");
+//        CollapsingToolbarLayout collapsingToolbar =
+//                (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+//        collapsingToolbar.setTitle("Escursione");
 //        collapsingToolbar.setExpandedTitleTextAppearance(R.style.expandedAppbar);
 
         //setto l'appbar collapsed, così vedo una sola riga, mantenendo il dettaglio se scrollo
-        AppBarLayout appbar = (AppBarLayout) findViewById(R.id.appbar);
-        appbar.setExpanded(false);
+//        AppBarLayout appbar = (AppBarLayout) findViewById(R.id.appbar);
+//        appbar.setExpanded(false);
 
+//        AppBarLayout.LayoutParams params = (AppBarLayout.LayoutParams) collapsingToolbar.getLayoutParams();
+//        params.setScrollFlags(0);  // clear all scroll flags
 
-        btnStart = (Button) findViewById(R.id.big_start_button);
-        btnStart.setOnClickListener(this);
+//
+//        btnStart = (Button) findViewById(R.id.big_start_button);
+//        btnStart.setOnClickListener(this);
+//
+//        btnStop = (Button) findViewById(R.id.stop_button);
+//        btnStop.setOnClickListener(this);
+//        btnStop.setEnabled(false);
+//
+//        btnPause = (Button) findViewById(R.id.pause_button);
+//        btnPause.setOnClickListener(this);
+//        btnPause.setEnabled(false);
+//
+//        btnReStart = (Button) findViewById(R.id.restart_button);
+//        btnReStart.setOnClickListener(this);
+//        btnReStart.setEnabled(false);
+//
+//        btnLock = (IconicsButton) findViewById(R.id.lock_button);
+//        btnLock.setOnClickListener(this);
 
-        btnStop = (Button) findViewById(R.id.stop_button);
-        btnStop.setOnClickListener(this);
-        btnStop.setEnabled(false);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setVisibility(View.VISIBLE);
 
-        btnPause = (Button) findViewById(R.id.pause_button);
-        btnPause.setOnClickListener(this);
-        btnPause.setEnabled(false);
-
-        btnReStart = (Button) findViewById(R.id.restart_button);
-        btnReStart.setOnClickListener(this);
-        btnReStart.setEnabled(false);
-
-        btnLock = (IconicsButton) findViewById(R.id.lock_button);
-        btnLock.setOnClickListener(this);
-
+        fab.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Log.wtf("fab", "fab pressed");
+            }
+        });
         altitude = (TextView) findViewById(R.id.id_altitude);
         latText = (TextView) findViewById(R.id.id_lat_text);
         lonText = (TextView) findViewById(R.id.id_lon_text);
         mFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_fragment);
         mFragment.getMapAsync(this);
+    }
+
+    public void initDrawer(Bundle savedInstanceState){
+        itemUno = new PrimaryDrawerItem()
+                .withIdentifier(1)
+                .withName("GpsActivity")
+                .withIcon(GoogleMaterial.Icon.gmd_directions_run)
+                .withIconTintingEnabled(true)
+                .withBadgeStyle(new BadgeStyle()
+                        .withColorRes(R.color.md_red_700)
+                        .withTextColor(ContextCompat.getColor(this, R.color.md_white_1000)));
+        itemDue=itemUno;
+        itemTre=itemUno;
+        drawer = new DrawerBuilder()
+                .withActivity(this)
+                .withToolbar((Toolbar) findViewById(R.id.toolbar))
+                .withHasStableIds(true)
+                .addDrawerItems(
+                        new SecondaryDrawerItem().withName("sezione Uno").withEnabled(false),
+                        itemUno,
+                        new DividerDrawerItem(),
+                        new SecondaryDrawerItem().withName("sezione due").withEnabled(false),
+                        itemDue,
+                        itemTre
+
+                )
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        if (drawerItem != null) {
+                            if (drawerItem.getIdentifier() == 1) {
+                                Log.wtf("Drawer","item1");
+                            } else if (drawerItem.getIdentifier() == 2) {
+                                Log.wtf("Drawer","item2");
+                            } else if (drawerItem.getIdentifier() == 3) {
+                                Log.wtf("Drawer","item3");
+                            }
+                        }
+                        return false;
+                    }
+                })
+                .withSavedInstance(savedInstanceState)
+                .withShowDrawerOnFirstLaunch(true)
+                .withSelectedItem(1)
+                .withOnDrawerListener(new Drawer.OnDrawerListener() {
+                    public void onDrawerOpened(View drawerView) {
+                    }
+
+                    public void onDrawerClosed(View drawerView) {
+
+                    }
+
+                    public void onDrawerSlide(View drawerView, float slideOffset) {
+                    }
+                })
+                .build();
+        drawer.openDrawer();
+
+    }
+
+
+    private void initToolbar() {
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        final ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+//            actionBar.setHomeAsUpIndicator(new IconicsDrawable(this)
+//                    .icon(GoogleMaterial.Icon.gmd_navigate_before)
+//                    .color(Color.RED)
+//                    .sizeDp(24));
+            actionBar.setDisplayHomeAsUpEnabled(true);
+
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_excursion, menu);
+        return true;
     }
 
     /************
@@ -280,22 +388,34 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
                 .build();
     }
 
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                finish();
-                Log.wtf(TAG, "home");
-                mGoogleMap.setMyLocationEnabled(true);
-                super.onBackPressed();
+               Log.wtf("HOME","home button pressed");
+                return true;
+            case R.id.miCompose:
+                Log.wtf("HOME","home button pressed");
                 break;
-            default:
-                Log.wtf(TAG, "default");
-                return super.onOptionsItemSelected(item);
         }
-        return true;
+        return super.onOptionsItemSelected(item);
     }
+//
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        switch (item.getItemId()) {
+//            case android.R.id.home:
+//                finish();
+//                Log.wtf(TAG, "home");
+//                mGoogleMap.setMyLocationEnabled(true);
+//                super.onBackPressed();
+//                break;
+//            default:
+//                Log.wtf(TAG, "default");
+//                return super.onOptionsItemSelected(item);
+//        }
+//        return true;
+//    }
 
 
     /************
@@ -366,7 +486,7 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
 
 
     public void onLocationChanged(Location location) {
-        mylocation=location;
+        mylocation = location;
         //place marker at current position
         //mGoogleMap.clear();
         if (currLocationMarker != null) {
@@ -397,7 +517,7 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
         FreezerLocation tmp = new FreezerLocation(location);
 //        mGoogleMap.animateCamera(CameraUpdateFactory
 //                .newCameraPosition(cameraPosition));
-        if(amIrunning) {
+        if (amIrunning) {
             Log.wtf("On locationChanged latLng", latLng.toString());
             locationList.add(location);
             freezerocationList.add(tmp);
@@ -430,11 +550,10 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-       Log.wtf(TAG, "marker clicked  " + marker.getTitle());
+        Log.wtf(TAG, "marker clicked  " + marker.getTitle());
         showdialog(marker);
         return true;
     }
-
 
 
     /************ END MAPS *************/
@@ -472,10 +591,10 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
     @Override
     public void onDestroy() {
         SupportMapFragment f = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_fragment);
-        Log.wtf(TAG,"onDestry");
-        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient,this);
+        Log.wtf(TAG, "onDestry");
+        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         if (f.isResumed()) {
-            Log.wtf(TAG,"is resumed");
+            Log.wtf(TAG, "is resumed");
         }
         super.onDestroy();
     }
@@ -486,10 +605,10 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
         super.onResume();
     }
 
-    public void showMyDialog(Marker marker){
+    public void showMyDialog(Marker marker) {
         final Marker myMark = marker;
-        LayoutInflater inflater= getLayoutInflater();
-        View view = inflater.inflate(R.layout.dialog,null);
+        LayoutInflater inflater = getLayoutInflater();
+        View view = inflater.inflate(R.layout.dialog, null);
         final CoordinatorLayout coordinatorLayout = (CoordinatorLayout) view.findViewById(R.id.coordinatorlayout);
         MyDialog.Builder builder = new MyDialog.Builder(this);
         builder.show();
@@ -503,9 +622,9 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
         final TextView lat = (TextView) view.findViewById(R.id.latTex);
         final TextView lon = (TextView) view.findViewById(R.id.lonTex);
 
-        lat.setText("Lat "+ marker.getPosition().latitude);
-        lon.setText("Lon "+ marker.getPosition().longitude);
-        if(!marker.getTitle().toString().isEmpty()){
+        lat.setText("Lat " + marker.getPosition().latitude);
+        lon.setText("Lon " + marker.getPosition().longitude);
+        if (!marker.getTitle().toString().isEmpty()) {
             text1.setText(marker.getTitle().toString());
         }
 
@@ -522,16 +641,16 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
             public void onClick(DialogInterface dialog, int id) {
                 dialog.dismiss();
                 count--;
-                if(count<0){
-                    count=0;
+                if (count < 0) {
+                    count = 0;
                 }
                 marker.remove();
                 marker.setVisible(false);
             }
         });
 
-        builder.setNeutralButton("Annulla", new DialogInterface.OnClickListener(){
-            public void onClick(DialogInterface dialog, int id){
+        builder.setNeutralButton("Annulla", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
                 dialog.dismiss();
             }
         });
