@@ -71,6 +71,9 @@ dependencies {
     //maps utils
     compile 'com.google.maps.android:android-maps-utils:0.4.3'
 
+    //sliding up panel
+    compile 'com.sothree.slidinguppanel:library:3.3.0'
+
 }
 apply plugin: 'com.google.gms.google-services'
 

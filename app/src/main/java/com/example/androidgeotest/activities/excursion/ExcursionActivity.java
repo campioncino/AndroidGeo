@@ -70,6 +70,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -136,6 +137,7 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
 
     public static int count;
     private PolylineOptions polylineOptions;
+    private Polyline polyline;
 
     private Bundle mbundle;
     private int viewId;
@@ -191,7 +193,7 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
 
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
         View headerView = navigationView.getHeaderView(0);
-        initDrawer(savedInstanceState);
+   //     initDrawer(savedInstanceState);
 //        mapFragment = new MapFragment();
 //        getSupportFragmentManager().beginTransaction()
 //                .replace(R.id.map_fragment, mapFragment).commit();
@@ -227,7 +229,7 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
 //        btnLock.setOnClickListener(this);
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setVisibility(View.VISIBLE);
+        fab.setVisibility(View.GONE);
 
         fab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -244,18 +246,25 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
     public void initDrawer(Bundle savedInstanceState){
         itemUno = new PrimaryDrawerItem()
                 .withIdentifier(1)
-                .withName("GpsActivity")
+                .withName("Draw")
                 .withIcon(GoogleMaterial.Icon.gmd_directions_run)
                 .withIconTintingEnabled(true)
                 .withBadgeStyle(new BadgeStyle()
                         .withColorRes(R.color.md_red_700)
                         .withTextColor(ContextCompat.getColor(this, R.color.md_white_1000)));
-        itemDue=itemUno;
+        itemDue=new PrimaryDrawerItem()
+                .withIdentifier(2)
+                .withName("Clear")
+                .withIcon(GoogleMaterial.Icon.gmd_directions_run)
+                .withIconTintingEnabled(true)
+                .withBadgeStyle(new BadgeStyle()
+                        .withColorRes(R.color.md_red_700)
+                        .withTextColor(ContextCompat.getColor(this, R.color.md_white_1000)));;
         itemTre=itemUno;
         drawer = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar((Toolbar) findViewById(R.id.toolbar))
-                .withHasStableIds(true)
+//                .withHasStableIds(true)
                 .addDrawerItems(
                         new SecondaryDrawerItem().withName("sezione Uno").withEnabled(false),
                         itemUno,
@@ -270,8 +279,14 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
                         if (drawerItem != null) {
                             if (drawerItem.getIdentifier() == 1) {
                                 Log.wtf("Drawer","item1");
+                                draw(locationList);
                             } else if (drawerItem.getIdentifier() == 2) {
                                 Log.wtf("Drawer","item2");
+                                if(polyline!=null){
+                                    clearDraw(polyline);
+
+                                }
+
                             } else if (drawerItem.getIdentifier() == 3) {
                                 Log.wtf("Drawer","item3");
                             }
@@ -300,8 +315,13 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
 
 
     private void initToolbar() {
+        //        Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
+//
+//        setSupportActionBar((Toolbar) findViewById(R.id.main_toolbar));
+//        this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         final ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
 //            actionBar.setHomeAsUpIndicator(new IconicsDrawable(this)
@@ -322,9 +342,6 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
                 MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
 
         addPlace.setVisible(true);
-
-        getMenuInflater().inflate(R.menu.menu_excursion, menu);
-
         return true;
     }
 
@@ -403,14 +420,12 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
         switch (item.getItemId()) {
             case android.R.id.home:
                Log.wtf("HOME","home button pressed");
+                finish();
                 return true;
-            case R.id.miAddPlace:
-                Log.wtf("ADD PLACE","place button pressed");
-                doPickPoint();
-                break;
             case MENU_ADD:
                 doPickPoint();
                 break;
@@ -560,14 +575,21 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
             Log.wtf("polyline", loc.toString());
         }
         polylineOptions.width(5).color(Color.BLUE);
-        mGoogleMap.addPolyline(polylineOptions);
+        polyline = mGoogleMap.addPolyline(polylineOptions);
 
+//        mGoogleMap.addPolyline(polylineOptions);
+
+    }
+
+    public void clearDraw(Polyline pol){
+       pol.remove();
     }
 
 
     @Override
     public boolean onMarkerClick(Marker marker) {
         Log.wtf(TAG, "marker clicked  " + marker.getTitle());
+//        multipleChoice(this,marker);
         showdialog(marker);
         return true;
     }
@@ -649,22 +671,50 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
         final Marker mymarker = marker;
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(view);
+        builder.setItems(new CharSequence[]
+                        {"Elimina Punto", "button 2", "button 3", "button 4"},
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // The 'which' argument contains the index position
+                        // of the selected item
+                        switch (which) {
+                            case 0:
+                                Log.wtf("multiDialog","clicked 1");
+                                count--;
+                                if (count < 0) {
+                                    count = 0;
+                                }
+                                marker.remove();
+                                marker.setVisible(false);
+                                break;
+                            case 1:
+                                Log.wtf("multiDialog","clicked 2");
+                                break;
+                            case 2:
+                                Log.wtf("multiDialog","clicked 3");
+                                break;
+                            case 3:
+                                Log.wtf("multiDialog","clicked 4");
+                                break;
+                        }
+                    }
+                });
         builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
 
             }
         });
-        builder.setNegativeButton("Elimina", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.dismiss();
-                count--;
-                if (count < 0) {
-                    count = 0;
-                }
-                marker.remove();
-                marker.setVisible(false);
-            }
-        });
+//        builder.setNegativeButton("Elimina", new DialogInterface.OnClickListener() {
+//            public void onClick(DialogInterface dialog, int id) {
+//                dialog.dismiss();
+//                count--;
+//                if (count < 0) {
+//                    count = 0;
+//                }
+//                marker.remove();
+//                marker.setVisible(false);
+//            }
+//        });
 
         builder.setNeutralButton("Annulla", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
@@ -693,5 +743,36 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
         });
 
     }
+
+public void multipleChoice(Context context,Marker marker){
+    LayoutInflater inflater = getLayoutInflater();
+    View view = inflater.inflate(R.layout.dialog, null);
+    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+    builder.setView(view);
+    builder.setTitle("MultiChoice");
+    builder.setItems(new CharSequence[]
+                    {"button 1", "button 2", "button 3", "button 4"},
+            new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    // The 'which' argument contains the index position
+                    // of the selected item
+                    switch (which) {
+                        case 0:
+                            Log.wtf("multiDialog","clicked 1");
+                            break;
+                        case 1:
+                            Log.wtf("multiDialog","clicked 2");
+                            break;
+                        case 2:
+                            Log.wtf("multiDialog","clicked 3");
+                            break;
+                        case 3:
+                            Log.wtf("multiDialog","clicked 4");
+                            break;
+                    }
+                }
+            });
+    builder.create().show();
+}
 
 }
