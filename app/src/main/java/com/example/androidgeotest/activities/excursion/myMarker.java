@@ -5,22 +5,41 @@ package com.example.androidgeotest.activities.excursion;
  */
 
 
+import android.location.Location;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;
 
-public class myMarker implements ClusterItem {
-    public final String name;
-    public final int profilePhoto;
-    private final LatLng mPosition;
+public class MyMarker {
+    private final String description;
+    private final Location loc;
+    private int progressiveValue;
 
-    public myMarker(LatLng position, String name, int pictureResource) {
-        this.name = name;
-        profilePhoto = pictureResource;
-        mPosition = position;
+    public MyMarker(String description, Location loc, Integer val) {
+        this.description = description;
+        this.loc = loc;
+        this.progressiveValue=val;
     }
 
-    @Override
-    public LatLng getPosition() {
-        return mPosition;
+    public MyMarker(Location loc, Integer val) {
+        this.description = "";
+        this.loc = loc;
+        this.progressiveValue=val;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public Location getLoc() {
+        return loc;
+    }
+
+    public int getProgressiveValue() {
+        return progressiveValue;
+    }
+
+    public void setProgressiveValue(int progressiveValue) {
+        this.progressiveValue = progressiveValue;
     }
 }

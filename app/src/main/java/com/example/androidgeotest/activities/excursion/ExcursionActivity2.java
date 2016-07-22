@@ -56,6 +56,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.maps.android.ui.IconGenerator;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.iconics.view.IconicsButton;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
@@ -66,7 +67,9 @@ import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import fr.quentinklein.slt.LocationTracker;
 
@@ -79,6 +82,7 @@ import static android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
  */
 public class ExcursionActivity2 extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, GoogleMap.OnMarkerClickListener {
     private static final int MENU_ADD = 100;
+    private static final int MENU_CLEAR = 101;
     private FreezerRace myrace;
     private Fragment mapFragment;
     final static String TAG = ExcursionActivity2.class.getSimpleName();
@@ -102,6 +106,7 @@ public class ExcursionActivity2 extends AppCompatActivity implements View.OnClic
     private GoogleMap mGoogleMap;
     private SupportMapFragment mFragment;
     private Marker currLocationMarker;
+    private HashMap<MyMarker,Integer> markerList = new HashMap<>();
 
     public static int count;
     private PolylineOptions polylineOptions;
@@ -168,6 +173,7 @@ public class ExcursionActivity2 extends AppCompatActivity implements View.OnClic
         fab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Log.wtf("fab", "fab pressed");
+                doPickPoint();
             }
         });
         altitude = (TextView) findViewById(R.id.id_altitude);
@@ -175,6 +181,7 @@ public class ExcursionActivity2 extends AppCompatActivity implements View.OnClic
         lonText = (TextView) findViewById(R.id.id_lon_text);
         mFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_fragment);
         mFragment.getMapAsync(this);
+
     }
 
 
@@ -197,12 +204,21 @@ public class ExcursionActivity2 extends AppCompatActivity implements View.OnClic
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        MenuItem addPlace;
-        addPlace = menu.add(0, MENU_ADD, 0, "Save").setIcon(R.drawable.map_marker_plus);
-        MenuItemCompat.setShowAsAction(addPlace,
+        MenuItem clearMap;
+        IconicsDrawable ic1 = new IconicsDrawable(this)
+                .icon(GoogleMaterial.Icon.gmd_layers_clear)
+                .color(Color.WHITE)
+                .sizeDp(22);
+        clearMap = menu.add(0, MENU_CLEAR, 0, "clear").setIcon(ic1);
+        clearMap.setVisible(true);
+//        MenuItem addPlace;
+//        addPlace = menu.add(0, MENU_ADD, 0, "Save").setIcon(R.drawable.map_marker_plus);
+//        MenuItemCompat.setShowAsAction(addPlace,
+//                MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+        MenuItemCompat.setShowAsAction(clearMap,
                 MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
 
-        addPlace.setVisible(true);
+
         return true;
     }
 
@@ -241,9 +257,17 @@ public class ExcursionActivity2 extends AppCompatActivity implements View.OnClic
 
             placeMArker(this, count, latLng, mGoogleMap);
 
+            MyMarker marker = new MyMarker(mLastLocation,count);
+            markerList.put(marker,count);
 
             count++;
         }
+    }
+
+    private void clearAll(){
+        Log.wtf(TAG,"cancella tutto");
+        mGoogleMap.clear();
+        count=0;
     }
 
     private void placeMArker(Context context, int count, LatLng latLng, GoogleMap mGoogleMap) {
@@ -289,6 +313,9 @@ public class ExcursionActivity2 extends AppCompatActivity implements View.OnClic
                 return true;
             case MENU_ADD:
                 doPickPoint();
+                break;
+            case MENU_CLEAR:
+                clearAll();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -541,11 +568,11 @@ public class ExcursionActivity2 extends AppCompatActivity implements View.OnClic
                         switch (which) {
                             case 0:
                                 Log.wtf("multiDialog","clicked 1");
-                                count--;
                                 if (count < 0) {
                                     count = 0;
                                 }
                                 marker.remove();
+                                count=markerList.size();
                                 marker.setVisible(false);
                                 break;
                             case 1:
