@@ -31,6 +31,8 @@ import android.widget.Toast;
 
 import com.example.androidgeotest.R;
 import com.example.androidgeotest.activities.Code;
+import com.example.androidgeotest.activities.DetailFragment;
+import com.example.androidgeotest.activities.DummyFragment;
 import com.example.androidgeotest.activities.Util.MyApplication;
 import com.example.androidgeotest.activities.Util.MyDialog;
 import com.example.androidgeotest.activities.business.model.FreezerLocation;
@@ -65,6 +67,7 @@ import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -107,6 +110,7 @@ public class ExcursionActivity2 extends AppCompatActivity implements View.OnClic
     private SupportMapFragment mFragment;
     private Marker currLocationMarker;
     private HashMap<MyMarker,Integer> markerList = new HashMap<>();
+    private DetailFragment detailFragment;
 
     public static int count;
     private PolylineOptions polylineOptions;
@@ -125,6 +129,7 @@ public class ExcursionActivity2 extends AppCompatActivity implements View.OnClic
 
     private NavigationView navigationView;
     public Drawer drawer = null;
+    public ExcursionActivity2 activity;
 
     public PrimaryDrawerItem itemUno = null;
     public PrimaryDrawerItem itemDue = null;
@@ -140,6 +145,8 @@ public class ExcursionActivity2 extends AppCompatActivity implements View.OnClic
 
     private int mDProcessedSensorType;
     FreezerRaceEntityManager fRaceEm = new FreezerRaceEntityManager();
+
+    private SlidingUpPanelLayout slidingUpPanelLayout;
 
     public DatabaseReference rootRef;
 
@@ -158,11 +165,17 @@ public class ExcursionActivity2 extends AppCompatActivity implements View.OnClic
 //
 //        setSupportActionBar((Toolbar) findViewById(R.id.main_toolbar));
 //        this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        setContentView(R.layout.excursion_layout_activity_2);
+        setContentView(R.layout.excursion_layout_activity_3);
         initToolbar();
+        slidingUpPanelLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
 
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.content);
         myExcursionPanel = findViewById(R.id.myExcursionPanelLayout);
+
+        detailFragment = new DetailFragment();
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.detail_fragment, detailFragment).commit();
+
 
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
 
@@ -182,6 +195,7 @@ public class ExcursionActivity2 extends AppCompatActivity implements View.OnClic
         mFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_fragment);
         mFragment.getMapAsync(this);
 
+        activity = this;
     }
 
 
@@ -473,12 +487,18 @@ public class ExcursionActivity2 extends AppCompatActivity implements View.OnClic
        pol.remove();
     }
 
+    public DetailFragment getDetailFragment() {
+        return detailFragment;
+    }
 
     @Override
     public boolean onMarkerClick(Marker marker) {
         Log.wtf(TAG, "marker clicked  " + marker.getTitle());
 //        multipleChoice(this,marker);
-        showdialog(marker);
+
+        getDetailFragment().add(marker);
+        slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+//        showdialog(marker);
         return true;
     }
 
