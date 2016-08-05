@@ -29,6 +29,7 @@ public class DetailFragment extends Fragment {
     private TextView latitude;
     private TextView longitude;
 
+    private Toolbar toolbar;
     private ExcursionActivity2 activity;
     private View view;
 
@@ -49,6 +50,8 @@ public class DetailFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         activity = (ExcursionActivity2) getActivity();
+        toolbar = (Toolbar) activity.findViewById(R.id.toolbar_detail);
+        toolbar.setTitle("titolo a caso");
         view = getView();
     }
 

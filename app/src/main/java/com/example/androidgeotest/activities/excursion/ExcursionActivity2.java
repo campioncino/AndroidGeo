@@ -23,6 +23,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -68,6 +69,8 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelSlideListener;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelState;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -79,6 +82,7 @@ import fr.quentinklein.slt.LocationTracker;
 import static android.graphics.Typeface.BOLD;
 import static android.graphics.Typeface.ITALIC;
 import static android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
+
 
 /**
  * Created by r.sciamanna on 29/06/2016.
@@ -168,6 +172,23 @@ public class ExcursionActivity2 extends AppCompatActivity implements View.OnClic
         setContentView(R.layout.excursion_layout_activity_3);
         initToolbar();
         slidingUpPanelLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
+
+        slidingUpPanelLayout.addPanelSlideListener(new PanelSlideListener() {
+            @Override
+            public void onPanelSlide(View panel, float slideOffset) {
+            }
+
+            @Override
+            public void onPanelStateChanged(View panel, PanelState previousState, PanelState newState) {
+                System.out.println("on panel state changed :"+"new panel state ="+newState.toString()+ " | previousState ="+previousState.toString());
+                if(previousState==PanelState.COLLAPSED){
+                    fab.setVisibility(View.GONE);
+                }
+                if(previousState== PanelState.EXPANDED){
+                    fab.setVisibility(View.VISIBLE);
+                }
+            }
+        });
 
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.content);
         myExcursionPanel = findViewById(R.id.myExcursionPanelLayout);
@@ -351,6 +372,16 @@ public class ExcursionActivity2 extends AppCompatActivity implements View.OnClic
 //        return true;
 //    }
 
+    @Override
+    public void onBackPressed() {
+        if (slidingUpPanelLayout != null &&
+                (slidingUpPanelLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED || slidingUpPanelLayout.getPanelState() == SlidingUpPanelLayout.PanelState.ANCHORED)) {
+            fab.setVisibility(View.VISIBLE);
+            slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+        } else {
+            super.onBackPressed();
+        }
+    }
 
     /************
      * MAPS
@@ -501,7 +532,6 @@ public class ExcursionActivity2 extends AppCompatActivity implements View.OnClic
 //        showdialog(marker);
         return true;
     }
-
 
     /************ END MAPS *************/
 

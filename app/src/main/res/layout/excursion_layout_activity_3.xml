@@ -25,8 +25,8 @@
                 sothree:umanoClipPanel="false"
                 sothree:umanoDragView="@+id/sliding_toolbar"
                 sothree:umanoOverlay="true"
-                sothree:umanoPanelHeight="50dp"
-                sothree:umanoParallaxOffset="100dp"
+                sothree:umanoPanelHeight="5dp"
+                sothree:umanoParallaxOffset="10dp"
                 sothree:umanoScrollableView="@+id/markerOptions"
                 sothree:umanoShadowHeight="4dp">
 
@@ -35,8 +35,7 @@
                 <LinearLayout
                     android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="62dp">
+                    android:layout_height="wrap_content">
 
                     <android.support.design.widget.AppBarLayout
                         android:id="@+id/appBarLayout"
@@ -98,6 +97,7 @@
                         </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
+
                 /*detail*/
 
                 <android.support.v7.widget.CardView xmlns:custom="http://schemas.android.com/apk/res-auto"
@@ -119,23 +119,20 @@
 
 
                         <LinearLayout
-                            android:layout_width="fill_parent"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical">
 
                             <android.support.v7.widget.Toolbar
-                                android:id="@+id/sliding_toolbar"
+                                android:id="@+id/toolbar_detail"
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:minHeight="?attr/actionBarSize" />
+                                android:layout_height="match_parent"
+                                android:minHeight="?attr/actionBarSize"
+                                android:background="?attr/colorPrimary"
+                                />
 
                         </LinearLayout>
 
-
-                        <!--<android.support.v7.widget.RecyclerView-->
-                        <!--android:id="@+id/capiList"-->
-                        <!--android:layout_width="match_parent"-->
-                        <!--android:layout_height="match_parent" />-->
 
                         <FrameLayout
                             android:id="@+id/detail_fragment"
@@ -160,7 +157,7 @@
             android:layout_margin="16dp"
             android:background="#9fff38"
             app:fabSize="normal"
-            app:layout_anchor="@id/ll2"
+            app:layout_anchor="@id/map_fragment"
             app:layout_anchorGravity="left|bottom" />
         <!--app:headerLayout="@layout/mainmenu_header"-->
     </android.support.design.widget.CoordinatorLayout>
