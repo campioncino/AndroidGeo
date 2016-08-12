@@ -8,38 +8,34 @@ package com.example.androidgeotest.activities.excursion;
 import android.location.Location;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.maps.android.clustering.ClusterItem;
 
-public class MyMarker {
-    private final String description;
-    private final Location loc;
+public class MyMarker extends Location{
+    private  String description;
+
     private int progressiveValue;
 
-    public MyMarker(String description, Location loc, Integer val) {
+//
+//    public MyMarker(String provider) {
+//        super(provider);
+//    }
+//
+//    public MyMarker(Location l) {
+//        super(l);
+//    }
+
+    public MyMarker(Location l, int val) {
+        super(l);
+        this.progressiveValue=val;
+    }
+    public MyMarker(Location l, int val, String description) {
+        super(l);
+        this.progressiveValue=val;
         this.description = description;
-        this.loc = loc;
-        this.progressiveValue=val;
-    }
-
-    public MyMarker(Location loc, Integer val) {
-        this.description = "";
-        this.loc = loc;
-        this.progressiveValue=val;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public Location getLoc() {
-        return loc;
     }
 
     public int getProgressiveValue() {
         return progressiveValue;
-    }
-
-    public void setProgressiveValue(int progressiveValue) {
-        this.progressiveValue = progressiveValue;
     }
 }

@@ -199,7 +199,7 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
 //                .replace(R.id.map_fragment, mapFragment).commit();
 //        CollapsingToolbarLayout collapsingToolbar =
 //                (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-//        collapsingToolbar.setTitle("Escursione");
+//        collapsingToolbar.setTitle("EscursioneActivity");
 //        collapsingToolbar.setExpandedTitleTextAppearance(R.style.expandedAppbar);
 
         //setto l'appbar collapsed, così vedo una sola riga, mantenendo il dettaglio se scrollo
@@ -565,6 +565,7 @@ public class ExcursionActivity extends AppCompatActivity implements View.OnClick
         //LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
 
     }
+
 
 
     public void draw(List<Location> locationList) {

@@ -113,7 +113,9 @@ public class ExcursionActivity2 extends AppCompatActivity implements View.OnClic
     private GoogleMap mGoogleMap;
     private SupportMapFragment mFragment;
     private Marker currLocationMarker;
+    private Marker selectedMarker;
     private HashMap<MyMarker,Integer> markerList = new HashMap<>();
+    private HashMap<Marker, MyMarker> mappaMarker = new HashMap<>();
     private DetailFragment detailFragment;
 
     public static int count;
@@ -207,7 +209,7 @@ public class ExcursionActivity2 extends AppCompatActivity implements View.OnClic
         fab.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Log.wtf("fab", "fab pressed");
-                doPickPoint();
+                doPickPoint2();
             }
         });
         altitude = (TextView) findViewById(R.id.id_altitude);
@@ -279,9 +281,9 @@ public class ExcursionActivity2 extends AppCompatActivity implements View.OnClic
         }
     }
 
-    private void doPickPoint() {
-        Log.wtf(TAG, "sono in pickpoint");
-
+    private void doPickPoint2(){
+        Log.wtf(TAG, "sono in pickpoint2");
+        Log.wtf("doPickPoint", "sono in pickpoint");
         Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
         if (mLastLocation != null) {
@@ -289,12 +291,60 @@ public class ExcursionActivity2 extends AppCompatActivity implements View.OnClic
             //mGoogleMap.clear();
             latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
             locationList.add(mLastLocation);
-
-            placeMArker(this, count, latLng, mGoogleMap);
-
             MyMarker marker = new MyMarker(mLastLocation,count);
             markerList.put(marker,count);
+            //
 
+            Log.wtf("doPickPoint", "sono in pickpoint");
+            placeMarker(this, count, mLastLocation, mGoogleMap,marker);
+            count++;
+        }
+    }
+
+
+    private void placeMarker(Context context, int count, Location location, GoogleMap mGoogleMap,MyMarker marker) {
+
+        IconGenerator iconFactory = new IconGenerator(this);
+        LatLng latlng = new LatLng(location.getLatitude(),location.getLongitude());
+        Marker placed;
+//        iconFactory.setRotation(0);
+//        iconFactory.setContentRotation(0);
+        if (count == 0) {
+            iconFactory.setStyle(IconGenerator.STYLE_BLUE);
+//            iconFactory.setBackground(new IconicsDrawable(this)
+//                    .icon(GoogleMaterial.Icon.gmd_directions_car)
+//                    .color(Color.BLUE)
+//                    .sizeDp(24));
+
+            placed=addIcon2(iconFactory, "P", latlng, mGoogleMap);
+//            placeMArker(context,count,latLng,mGoogleMap);
+        } else {
+            iconFactory.setStyle(IconGenerator.STYLE_ORANGE);
+            placed=addIcon2(iconFactory, "" + count, latlng, mGoogleMap);
+        }
+        mappaMarker.put(placed,marker);
+        mGoogleMap.setOnMarkerClickListener(this);
+
+
+    }
+
+
+    private void doPickPoint() {
+        Log.wtf(TAG, "sono in pickpoint");
+        Log.wtf("doPickPoint", "sono in pickpoint");
+        Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+        if (mLastLocation != null) {
+            //place marker at current position
+            //mGoogleMap.clear();
+            latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+            locationList.add(mLastLocation);
+            MyMarker marker = new MyMarker(mLastLocation,count);
+            markerList.put(marker,count);
+            //
+            mappaMarker.put(currLocationMarker,marker);
+            Log.wtf("doPickPoint", "sono in pickpoint");
+            placeMArker(this, count, latLng, mGoogleMap);
             count++;
         }
     }
@@ -343,7 +393,7 @@ public class ExcursionActivity2 extends AppCompatActivity implements View.OnClic
 
         switch (item.getItemId()) {
             case android.R.id.home:
-               Log.wtf("HOME","home button pressed");
+                Log.wtf("HOME","home button pressed");
                 finish();
                 return true;
             case MENU_ADD:
@@ -515,7 +565,7 @@ public class ExcursionActivity2 extends AppCompatActivity implements View.OnClic
     }
 
     public void clearDraw(Polyline pol){
-       pol.remove();
+        pol.remove();
     }
 
     public DetailFragment getDetailFragment() {
@@ -527,7 +577,8 @@ public class ExcursionActivity2 extends AppCompatActivity implements View.OnClic
         Log.wtf(TAG, "marker clicked  " + marker.getTitle());
 //        multipleChoice(this,marker);
 
-        getDetailFragment().add(marker);
+        MyMarker myDataObj = mappaMarker.get(marker);
+        getDetailFragment().showDetail(myDataObj);
         slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
 //        showdialog(marker);
         return true;
@@ -539,14 +590,31 @@ public class ExcursionActivity2 extends AppCompatActivity implements View.OnClic
     /***********
      * MAPS EXTENSION
      **********/
+    private Marker addIcon2(IconGenerator iconFactory, CharSequence text, LatLng position, GoogleMap map) {
+        MarkerOptions markerOptions = new MarkerOptions().
+                icon(BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon(text))).
+                position(position).
+                anchor(iconFactory.getAnchorU(), iconFactory.getAnchorV())
+                .title(position.latitude + "," + position.longitude)
+                .alpha(count)
+                .draggable(true);
+
+        return map.addMarker(markerOptions);
+
+    }
+
+
     private void addIcon(IconGenerator iconFactory, CharSequence text, LatLng position, GoogleMap map) {
         MarkerOptions markerOptions = new MarkerOptions().
                 icon(BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon(text))).
                 position(position).
                 anchor(iconFactory.getAnchorU(), iconFactory.getAnchorV())
-                .title(position.latitude + "," + position.longitude);
+                .title(position.latitude + "," + position.longitude)
+                .alpha(count)
+                .draggable(true);
 
-        map.addMarker(markerOptions).setDraggable(true);
+        selectedMarker = map.addMarker(markerOptions);
+
     }
 
 
@@ -682,35 +750,35 @@ public class ExcursionActivity2 extends AppCompatActivity implements View.OnClic
 
     }
 
-public void multipleChoice(Context context,Marker marker){
-    LayoutInflater inflater = getLayoutInflater();
-    View view = inflater.inflate(R.layout.dialog, null);
-    AlertDialog.Builder builder = new AlertDialog.Builder(context);
-    builder.setView(view);
-    builder.setTitle("MultiChoice");
-    builder.setItems(new CharSequence[]
-                    {"button 1", "button 2", "button 3", "button 4"},
-            new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    // The 'which' argument contains the index position
-                    // of the selected item
-                    switch (which) {
-                        case 0:
-                            Log.wtf("multiDialog","clicked 1");
-                            break;
-                        case 1:
-                            Log.wtf("multiDialog","clicked 2");
-                            break;
-                        case 2:
-                            Log.wtf("multiDialog","clicked 3");
-                            break;
-                        case 3:
-                            Log.wtf("multiDialog","clicked 4");
-                            break;
+    public void multipleChoice(Context context,Marker marker){
+        LayoutInflater inflater = getLayoutInflater();
+        View view = inflater.inflate(R.layout.dialog, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setView(view);
+        builder.setTitle("MultiChoice");
+        builder.setItems(new CharSequence[]
+                        {"button 1", "button 2", "button 3", "button 4"},
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // The 'which' argument contains the index position
+                        // of the selected item
+                        switch (which) {
+                            case 0:
+                                Log.wtf("multiDialog","clicked 1");
+                                break;
+                            case 1:
+                                Log.wtf("multiDialog","clicked 2");
+                                break;
+                            case 2:
+                                Log.wtf("multiDialog","clicked 3");
+                                break;
+                            case 3:
+                                Log.wtf("multiDialog","clicked 4");
+                                break;
+                        }
                     }
-                }
-            });
-    builder.create().show();
-}
+                });
+        builder.create().show();
+    }
 
 }

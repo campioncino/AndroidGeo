@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import com.example.androidgeotest.R;
 import com.example.androidgeotest.activities.auth.GoogleSignInFragment;
+import com.example.androidgeotest.activities.excursion.EscursioneActivity;
 import com.example.androidgeotest.activities.excursion.ExcursionActivity;
 import com.example.androidgeotest.activities.excursion.ExcursionActivity2;
 import com.example.androidgeotest.activities.running.RunningActivity;
@@ -58,6 +59,7 @@ public class MainMenuActivity extends AppCompatActivity {
     public PrimaryDrawerItem itemUno = null;
     public PrimaryDrawerItem itemDue = null;
     public PrimaryDrawerItem itemTre = null;
+    public PrimaryDrawerItem itemQuattro = null;
 
     private Fragment currentFragment;
 
@@ -159,6 +161,16 @@ public class MainMenuActivity extends AppCompatActivity {
                         .withTextColor(ContextCompat.getColor(this, R.color.accent))
                         .withColorRes(R.color.md_white_1000));
 
+        itemQuattro = new PrimaryDrawerItem()
+                .withIdentifier(4)
+                .withName("Esplora")
+                .withIcon(GoogleMaterial.Icon.gmd_terrain)
+                .withIconColorRes(R.color.green900)
+                .withSelectedIconColor(ContextCompat.getColor(this, R.color.md_amber_300))
+                .withIconTintingEnabled(true)
+                .withBadgeStyle(new BadgeStyle()
+                        .withTextColor(ContextCompat.getColor(this, R.color.accent))
+                        .withColorRes(R.color.md_white_1000));
 
         drawer = new DrawerBuilder()
                 .withActivity(this)
@@ -172,7 +184,8 @@ public class MainMenuActivity extends AppCompatActivity {
                         new DividerDrawerItem(),
                         new SecondaryDrawerItem().withName("sezione due").withEnabled(false),
                         itemDue,
-                        itemTre
+                        itemTre,
+                        itemQuattro
 
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
@@ -180,10 +193,12 @@ public class MainMenuActivity extends AppCompatActivity {
                         if (drawerItem != null) {
                             if (drawerItem.getIdentifier() == 1) {
                                 openUno();
-                            } else if (drawerItem.getIdentifier() == 2) {
+                            } else if (drawerItem.getIdentifier() == 2 ) {
                                 openDue();
                             } else if (drawerItem.getIdentifier() == 3) {
                                 openTre();
+                            } else if (drawerItem.getIdentifier() == 4 ) {
+                                openQuattro();
                             }
                         }
                         return false;
@@ -328,6 +343,11 @@ public class MainMenuActivity extends AppCompatActivity {
 //        startActivity(i);
     }
 
+
+    private void openQuattro() {
+        Intent i = new Intent(this, EscursioneActivity.class);
+        startActivity(i);
+    }
     public void openLogin() {
         currentFragment = new GoogleSignInFragment();
         FragmentManager fragmentManager = getSupportFragmentManager();
